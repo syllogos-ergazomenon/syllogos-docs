@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Σύλλογος Εργαζομένων — Ψηφιακό Αρχείο</title>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink:    #1a1410;
+      --paper:  #fdfcf9;
+      --cream:  #f2ece0;
+      --rust:   #8b3a2a;
+      --gold:   #c9a84c;
+      --muted:  #7a7060;
+      --border: #e0d8c8;
+      --green:  #2d6a4f;
+    }
+    body { font-family: 'Noto Serif', Georgia, serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    }
+
+    /* ══ ADMIN BAR ══ */
+    #admin-bar {
+      display: none; position: relative; z-index: 2;
+      background: #16100a; color: #f0ead8;
+      padding: 0.5rem 1.5rem; border-bottom: 2px solid var(--gold);
+      align-items: center; gap: 1rem; font-size: 0.8rem;
+    }
+    #admin-bar.show { display: flex; }
+    #admin-bar .ab-label { flex: 1; font-style: italic; color: #9a8868; }
+    #admin-bar button { background: none; border: 1px solid #6a5a40; border-radius: 3px; color: #f0ead8; padding: 0.28rem 0.75rem; cursor: pointer; font-family: inherit; font-size: 0.76rem; transition: background 0.2s; }
+    #admin-bar button:hover { background: rgba(255,255,255,0.08); }
+
+    /* ══ HEADER ══ */
+    header {
+      position: relative; z-index: 1;
+      background: var(--ink); color: var(--paper);
+      text-align: center;
+      padding: 3.5rem 1.5rem 3rem;
+      border-bottom: 5px solid var(--gold);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    header::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background-image: repeating-linear-gradient(-55deg, transparent, transparent 30px, rgba(201,168,76,0.03) 30px, rgba(201,168,76,0.03) 31px);
+    }
+
+    /* logo — αριστερά, absolute */
+    .header-logo-image {
+      position: absolute; top: 1.2rem; left: 1.8rem;
+      height: 90px; width: auto;
+      cursor: pointer;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+      transition: filter 0.2s;
+    }
+    .header-logo-image:hover { filter: drop-shadow(0 2px 14px rgba(201,168,76,0.5)); }
+
+    .masthead-rule { width: 60px; height: 2px; background: var(--gold); margin: 0 auto 1rem; position: relative; z-index: 1; }
+    header h1 {
+      font-family: 'Marcellus', serif;
+      font-size: clamp(1.8rem, 5vw, 3.2rem);
+      font-weight: 400; letter-spacing: 0.05em; line-height: 1.2;
+      position: relative; z-index: 1;
+    }
+    header h1 span { color: var(--gold); }
+    header p.subtitle {
+      margin-top: 0.8rem; font-style: italic; color: #d8d0c0;
+      font-size: 1rem; letter-spacing: 0.02em;
+      position: relative; z-index: 1;
+    }
+    .header-tagline {
+      margin-top: 1rem; font-size: 0.72rem; letter-spacing: 0.18em;
+      color: #6a6050; text-transform: uppercase;
+      position: relative; z-index: 1;
+    }
+
+    /* ══ SEARCH ══ */
+    .search-container {
+      position: relative; z-index: 1;
+      max-width: 600px; margin: -1.5rem auto 2.8rem; padding: 0 1.5rem;
+    }
+    #searchInput {
+      width: 100%; padding: 1rem 1.5rem 1rem 3.2rem;
+      font-family: inherit; font-size: 1rem;
+      border: 1px solid var(--border); border-radius: 30px;
+      background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      transition: all 0.25s;
+    }
+    #searchInput:focus { outline: none; border-color: var(--gold); box-shadow: 0 5px 20px rgba(201,168,76,0.2); }
+    .search-icon { position: absolute; left: 2.8rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 1.1rem; pointer-events: none; }
+
+    /* ══ MAIN ══ */
+    main { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+
+    .section-label { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding: 0 0.5rem; }
+    .section-label h2 { font-family: 'Marcellus', serif; font-size: 1.5rem; font-weight: 400; white-space: nowrap; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ══ FOLDER GRID ══ */
+    #view-folders { }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.8rem; }
+    .folder-card {
+      background: white; border: 1px solid var(--border); border-top: 5px solid var(--rust);
+      border-radius: 6px; padding: 2.5rem 1.5rem;
+      cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.1rem;
+      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+      animation: fadeUp 0.5s ease both;
+      position: relative; overflow: hidden;
+    }
+    .folder-card::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.06), transparent 70%); opacity: 0; transition: opacity 0.3s; }
+    .folder-card:hover { box-shadow: 0 15px 35px rgba(0,0,0,0.12); border-top-color: var(--gold); transform: translateY(-8px); }
+    .folder-card:hover::after { opacity: 1; }
+    .folder-card:hover .f-icon { transform: scale(1.15); }
+    .f-icon { font-size: 3.5rem; transition: transform 0.3s; position: relative; z-index: 1; }
+    .f-name { font-family: 'Marcellus', serif; font-size: 1.2rem; font-weight: 400; min-height: 2.8em; display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; }
+    .f-action { font-size: 0.78rem; color: var(--rust); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; border: 1.5px solid var(--border); padding: 6px 16px; border-radius: 20px; transition: all 0.25s; position: relative; z-index: 1; }
+    .folder-card:hover .f-action { background: var(--rust); color: white; border-color: var(--rust); }
+
+    /* ══ DOC VIEW ══ */
+    #view-docs { display: none; }
+    .doc-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.8rem; flex-wrap: wrap; }
+    .back-btn { display: inline-flex; align-items: center; gap: 0.4rem; background: none; border: 1px solid var(--border); border-radius: 4px; padding: 0.45rem 0.9rem; font-family: inherit; font-size: 0.85rem; cursor: pointer; transition: background 0.2s; color: var(--ink); }
+    .back-btn:hover { background: var(--cream); }
+    .doc-title { font-family: 'Marcellus', serif; font-size: 1.4rem; flex: 1; }
+
+    #upload-btn {
+      display: none; align-items: center; gap: 0.5rem;
+      background: var(--rust); color: white; border: none; border-radius: 25px;
+      padding: 0.6rem 1.4rem; font-family: inherit; font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 10px rgba(139,58,42,0.3);
+    }
+    #upload-btn.show { display: flex; }
+    #upload-btn:hover { background: #a04535; transform: translateY(-1px); box-shadow: 0 5px 15px rgba(139,58,42,0.4); }
+    #upload-btn .plus { font-size: 1.4rem; line-height: 1; }
+
+    .doc-list { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+    .doc-item {
+      background: white; border: 1px solid var(--border); border-left: 4px solid var(--rust);
+      border-radius: 4px; display: flex; align-items: center; padding: 0.9rem 1.1rem; gap: 0.9rem;
+      text-decoration: none; color: var(--ink);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.18s;
+      animation: fadeUp 0.35s ease both;
+    }
+    .doc-item:hover { border-left-color: var(--gold); box-shadow: 0 5px 18px rgba(0,0,0,0.10); transform: translateX(4px); }
+    .doc-icon { flex-shrink: 0; width: 40px; height: 48px; background: var(--cream); border: 1px solid var(--border); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; position: relative; }
+    .doc-icon::after { content: ''; position: absolute; top: 0; right: 0; width: 11px; height: 11px; background: var(--paper); border-bottom: 1px solid var(--border); border-left: 1px solid var(--border); clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+    .doc-info { flex: 1; min-width: 0; }
+    .doc-name { font-size: 0.96rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .doc-meta { margin-top: 0.15rem; font-size: 0.75rem; color: var(--muted); font-style: italic; }
+    .doc-arrow { flex-shrink: 0; color: var(--muted); transition: color 0.2s, transform 0.2s; }
+    .doc-item:hover .doc-arrow { color: var(--rust); transform: translate(2px,-2px); }
+
+    .empty { text-align: center; padding: 3rem; background: white; border: 1px dashed var(--border); border-radius: 6px; color: var(--muted); font-style: italic; }
+    .loading { text-align: center; padding: 3rem; color: var(--muted); font-style: italic; }
+    .no-results { grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--muted); font-style: italic; font-size: 1.05rem; }
+
+    /* ══ MODALS ══ */
+    #login-overlay, #modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(26,20,16,0.7); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    #login-overlay.open, #modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--paper); border: 1px solid var(--border); border-top: 4px solid var(--rust);
+      border-radius: 6px; width: min(480px, 94vw); padding: 2rem;
+      animation: fadeUp 0.25s ease; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .modal-box h3 { font-family: 'Marcellus', serif; font-size: 1.2rem; margin-bottom: 1.4rem; }
+    .modal-box label { display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--muted); letter-spacing: 0.03em; }
+    .modal-box select, .modal-box input[type=text], .modal-box input[type=password] {
+      width: 100%; padding: 0.55rem 0.8rem; border: 1px solid var(--border); border-radius: 4px;
+      font-family: inherit; font-size: 0.9rem; background: white; color: var(--ink); margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .modal-box select:focus, .modal-box input:focus { outline: none; border-color: var(--rust); }
+    .drop-zone { border: 2px dashed var(--border); border-radius: 5px; padding: 1.8rem 1rem; text-align: center; cursor: pointer; margin-bottom: 1rem; transition: border-color 0.2s, background 0.2s; font-size: 0.88rem; color: var(--muted); }
+    .drop-zone.drag-over { border-color: var(--rust); background: #fff6f4; }
+    .drop-zone.has-file { border-color: var(--green); background: #f0fff6; color: var(--green); font-weight: 700; }
+    .drop-zone input[type=file] { display: none; }
+    .modal-actions { display: flex; gap: 0.7rem; justify-content: flex-end; margin-top: 0.5rem; }
+    .btn-cancel { background: none; border: 1px solid var(--border); border-radius: 4px; padding: 0.5rem 1rem; font-family: inherit; font-size: 0.88rem; cursor: pointer; transition: background 0.2s; }
+    .btn-cancel:hover { background: var(--cream); }
+    .btn-primary { background: var(--rust); color: white; border: none; border-radius: 4px; padding: 0.5rem 1.2rem; font-family: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn-primary:hover { background: #a04535; }
+    .btn-primary:disabled { background: var(--muted); cursor: default; }
+    #login-err { font-size: 0.8rem; color: var(--rust); min-height: 1.1em; margin-bottom: 0.5rem; }
+
+    /* ══ TOAST ══ */
+    #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: var(--paper); padding: 0.75rem 1.5rem; border-radius: 5px; border-left: 4px solid var(--gold); font-size: 0.88rem; z-index: 300; opacity: 0; transition: opacity 0.3s, transform 0.3s; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast.error { border-left-color: var(--rust); }
+
+    /* ══ FOOTER ══ */
+    footer { position: relative; z-index: 1; background: var(--cream); padding: 3.5rem 1.5rem; text-align: center; font-size: 0.9rem; color: var(--muted); border-top: 1px solid var(--border); }
+    .footer-content { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; align-items: center; }
+    .contact-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 10px 20px; border: 1px solid var(--muted); border-radius: 25px; color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: all 0.22s; }
+    .contact-btn:hover { background: var(--muted); color: white; }
+
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.35); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 4px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 768px) {
+      .header-logo-image { position: static; display: block; margin: 0 auto 1.2rem; height: 70px; }
+      header { padding-top: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ ADMIN BAR ══ -->
+<div id="admin-bar">
+  <span class="ab-label">🔧 Λειτουργία Διαχειριστή</span>
+  <button onclick="logout()">Αποσύνδεση</button>
+</div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <!-- Τριπλό κλικ στο λογότυπο για σύνδεση διαχειριστή -->
+  <img src="argo.png" alt="Αργώ" class="header-logo-image" id="logoBtn">
+  <div class="masthead-rule"></div>
+  <h1>Σύλλογος <span>Εργαζομένων</span></h1>
+  <p class="subtitle">Ψηφιακό Αρχείο Εγγράφων Π.Ε. Μαγνησίας &amp; Σποράδων</p>
+  <p class="header-tagline">Ενότητα · Αλληλεγγύη · Αγώνας</p>
+</header>
+
+<!-- ══ SEARCH ══ -->
+<div class="search-container">
+  <span class="search-icon">🔍</span>
+  <input type="text" id="searchInput" placeholder="Αναζήτηση κατηγορίας (π.χ. εκδρομές, νομοθεσία…)">
+</div>
+
+<!-- ══ MAIN ══ -->
+<main>
+  <!-- Φάκελοι -->
+  <div id="view-folders">
+    <div class="section-label"><h2>Κατηγορίες Αρχείων</h2></div>
+    <div class="grid" id="folderGrid"></div>
+  </div>
+
+  <!-- Έγγραφα -->
+  <div id="view-docs">
+    <div class="doc-header">
+      <button class="back-btn" onclick="showFolders()">← Πίσω</button>
+      <div class="doc-title" id="docTitle"></div>
+      <button id="upload-btn" onclick="openUpload()">
+        <span class="plus">+</span> Ανέβασμα αρχείου
+      </button>
+    </div>
+    <ul class="doc-list" id="docList"></ul>
+  </div>
+</main>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-content">
+    <p>&copy; <span id="yr"></span> Σύλλογος Εργαζομένων Π.Ε. Μαγνησίας</p>
+    <a href="mailto:syllogos@thessaly.gov.gr" class="contact-btn">✉ Επικοινωνία με τον Σύλλογο</a>
+  </div>
+</footer>
+
+<!-- ══ LOGIN MODAL ══ -->
+<div id="login-overlay">
+  <div class="modal-box">
+    <h3>🔐 Σύνδεση Διαχειριστή</h3>
+    <label>Κωδικός πρόσβασης</label>
+    <input type="password" id="pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+    <div id="login-err"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="document.getElementById('login-overlay').classList.remove('open')">Ακύρωση</button>
+      <button class="btn-primary" onclick="doLogin()">Σύνδεση</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ UPLOAD MODAL ══ -->
+<div id="modal-overlay">
+  <div class="modal-box">
+    <h3>📤 Ανέβασμα νέου εγγράφου</h3>
+    <label>Κατηγορία</label>
+    <select id="upload-folder-select"></select>
+    <label>Τίτλος <span style="font-weight:400;font-style:italic">(προαιρετικό)</span></label>
+    <input type="text" id="upload-title" placeholder="Αφήστε κενό για το όνομα αρχείου" />
+    <label>Αρχείο</label>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" onchange="handleFile(this)"/>
+      <div id="drop-text">📂 Κλικ ή σύρτε αρχείο εδώ<br/><small style="color:var(--muted)">PDF, Word, Excel, PowerPoint</small></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeUpload()">Ακύρωση</button>
+      <button class="btn-primary" id="do-upload-btn" onclick="doUpload()" disabled>Ανέβασμα</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════ */
+const SUPABASE_URL  = 'https://sjmmesnkpbeziyyrtvgo.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqbW1lc25rcGJleml5eXJ0dmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODQ3MjAsImV4cCI6MjA5NTM2MDcyMH0.o0lpEIsAfz0h46vQdZH9Bma5niq1qyqV0UZNYFQ7K24';
+const BUCKET        = 'eggrafa';
+const ADMIN_PASS    = 'Th3ss@lia!2026'; /* ← αλλαξέ το! */
+
+const FOLDERS = [
+  { name:'Αιτήσεις Εγγραφής-Διαγραφής', icon:'📝', folder:'aitiseis' },
+  { name:'Εκδρομές',                      icon:'🚌', folder:'ekdromes' },
+  { name:'Εκλογικά αποτελέσματα',         icon:'🗳️', folder:'eklogika' },
+  { name:'Ιατρικές Εξετάσεις',            icon:'🏥', folder:'iatrikes' },
+  { name:'Καταστατικό',                   icon:'📜', folder:'katastatiko' },
+  { name:'ΜΑΠ',                           icon:'📋', folder:'map' },
+  { name:'Νομοθεσία',                     icon:'⚖️', folder:'nomothesia' },
+  { name:'Ομαδικό Ασφαλιστήριο Υγείας',  icon:'🩺', folder:'asfalisterio' },
+  { name:'Προσφορές',                     icon:'🎁', folder:'prosfores' },
+  { name:'Τροποποιήσεις του Οργανισμού',  icon:'🏛️', folder:'tropopoiiseis' },
+  { name:'ΣΕΠΕΘ Εξοδολόγιο Πρότυπο',     icon:'📊', folder:'sepeth' },
+];
+
+/* ── STATE ── */
+let isAdmin = false, currentFolderIdx = null, selectedFile = null;
+
+/* ── SECRET LOGIN: τριπλό κλικ στο λογότυπο ── */
+let sc = 0, st = null;
+document.getElementById('logoBtn').addEventListener('click', () => {
+  sc++; clearTimeout(st); st = setTimeout(() => sc = 0, 1200);
+  if (sc >= 3) { sc = 0; openLogin(); }
+});
+
+function openLogin() {
+  document.getElementById('login-overlay').classList.add('open');
+  document.getElementById('pwd-input').value = '';
+  document.getElementById('login-err').textContent = '';
+  setTimeout(() => document.getElementById('pwd-input').focus(), 120);
+}
+function doLogin() {
+  if (document.getElementById('pwd-input').value === ADMIN_PASS) {
+    isAdmin = true;
+    document.getElementById('login-overlay').classList.remove('open');
+    document.getElementById('admin-bar').classList.add('show');
+    if (currentFolderIdx !== null) document.getElementById('upload-btn').classList.add('show');
+    showToast('✅ Συνδεθήκατε ως διαχειριστής');
+  } else {
+    document.getElementById('login-err').textContent = '❌ Λάθος κωδικός.';
+  }
+}
+function logout() {
+  isAdmin = false;
+  document.getElementById('admin-bar').classList.remove('show');
+  document.getElementById('upload-btn').classList.remove('show');
+  showToast('Αποσυνδεθήκατε');
+}
+
+/* ── NAV ── */
+function showFolders() {
+  currentFolderIdx = null;
+  document.getElementById('view-folders').style.display = '';
+  document.getElementById('view-docs').style.display = 'none';
+  document.getElementById('upload-btn').classList.remove('show');
+  renderFolders();
+}
+
+function renderFolders(filter = '') {
+  const grid = document.getElementById('folderGrid');
+  grid.innerHTML = '';
+  const filtered = FOLDERS.filter(f => f.name.toLowerCase().includes(filter.toLowerCase()));
+  if (!filtered.length) { grid.innerHTML = '<div class="no-results">Δεν βρέθηκαν κατηγορίες.</div>'; return; }
+  filtered.forEach((f, i) => {
+    const realIdx = FOLDERS.indexOf(f);
+    const card = document.createElement('div');
+    card.className = 'folder-card';
+    card.style.animationDelay = (i * 0.04) + 's';
+    card.innerHTML = `<div class="f-icon">${f.icon}</div><div class="f-name">${f.name}</div><div class="f-action">Άνοιγμα ↗</div>`;
+    card.addEventListener('click', () => openFolder(realIdx));
+    grid.appendChild(card);
+  });
+}
+
+async function openFolder(idx) {
+  currentFolderIdx = idx;
+  const f = FOLDERS[idx];
+  document.getElementById('view-folders').style.display = 'none';
+  document.getElementById('view-docs').style.display = '';
+  document.getElementById('docTitle').textContent = f.icon + ' ' + f.name;
+  if (isAdmin) document.getElementById('upload-btn').classList.add('show');
+  const list = document.getElementById('docList');
+  list.innerHTML = '<li><div class="loading">⏳ Φόρτωση εγγράφων...</div></li>';
+  try {
+    const files = await listFiles(f.folder);
+    renderDocs(files, f.folder);
+  } catch(e) {
+    list.innerHTML = '<li><div class="empty">⚠️ Σφάλμα φόρτωσης. Δοκιμάστε ξανά.</div></li>';
+  }
+}
+
+/* ── SUPABASE ── */
+async function listFiles(folder) {
+  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPABASE_ANON}`, 'apikey': SUPABASE_ANON },
+    body: JSON.stringify({ prefix: folder + '/', limit: 100, sortBy: { column:'name', order:'asc' } })
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return (await r.json()).filter(f => f.name && f.name !== '.emptyFolderPlaceholder');
+}
+
+function fileUrl(folder, name) {
+  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${folder}/${encodeURIComponent(name)}`;
+}
+
+function renderDocs(files, folder) {
+  const list = document.getElementById('docList');
+  list.innerHTML = '';
+  if (!files.length) {
+    list.innerHTML = '<li><div class="empty">Δεν υπάρχουν έγγραφα σε αυτή την κατηγορία ακόμα.</div></li>';
+    return;
+  }
+  files.forEach((f, j) => {
+    const ext = f.name.split('.').pop().toUpperCase();
+    const emoji = {PDF:'📄',DOC:'📝',DOCX:'📝',XLS:'📊',XLSX:'📊',PPT:'📽️',PPTX:'📽️'}[ext] || '📄';
+    const date = f.updated_at ? new Date(f.updated_at).toLocaleDateString('el-GR',{day:'numeric',month:'short',year:'numeric'}) : '';
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <a class="doc-item" href="${fileUrl(folder, f.name)}" target="_blank" rel="noopener" style="animation-delay:${0.04+j*0.04}s">
+        <div class="doc-icon">${emoji}</div>
+        <div class="doc-info">
+          <div class="doc-name">${f.name}</div>
+          <div class="doc-meta">${ext}${date?' · '+date:''}</div>
+        </div>
+        <span class="doc-arrow">↗</span>
+      </a>`;
+    list.appendChild(li);
+  });
+}
+
+/* ── UPLOAD ── */
+function buildSelect() {
+  const sel = document.getElementById('upload-folder-select');
+  sel.innerHTML = '';
+  FOLDERS.forEach((f, i) => {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = f.icon + ' ' + f.name;
+    if (i === currentFolderIdx) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+function openUpload() {
+  buildSelect(); selectedFile = null;
+  document.getElementById('drop-text').innerHTML = '📂 Κλικ ή σύρτε αρχείο εδώ<br/><small style="color:var(--muted)">PDF, Word, Excel, PowerPoint</small>';
+  document.getElementById('drop-zone').className = 'drop-zone';
+  document.getElementById('upload-title').value = '';
+  document.getElementById('do-upload-btn').disabled = true;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeUpload() { document.getElementById('modal-overlay').classList.remove('open'); }
+function handleFile(input) { if (input.files[0]) setFile(input.files[0]); }
+function setFile(file) {
+  selectedFile = file;
+  document.getElementById('drop-text').textContent = '✅ ' + file.name;
+  document.getElementById('drop-zone').className = 'drop-zone has-file';
+  document.getElementById('do-upload-btn').disabled = false;
+}
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
+
+async function doUpload() {
+  if (!selectedFile) return;
+  const idx = parseInt(document.getElementById('upload-folder-select').value);
+  const folder = FOLDERS[idx].folder;
+  const customTitle = document.getElementById('upload-title').value.trim();
+  const ext = selectedFile.name.split('.').pop();
+  const filename = customTitle ? (customTitle.toLowerCase().endsWith('.'+ext.toLowerCase()) ? customTitle : customTitle+'.'+ext) : selectedFile.name;
+  const btn = document.getElementById('do-upload-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Ανέβασμα...';
+  try {
+    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${folder}/${encodeURIComponent(filename)}`, {
+      method: 'POST',
+      headers: { 'Authorization':`Bearer ${SUPABASE_ANON}`, 'apikey': SUPABASE_ANON, 'Content-Type': selectedFile.type||'application/octet-stream', 'x-upsert':'true' },
+      body: selectedFile
+    });
+    if (!r.ok) throw new Error(await r.text());
+    closeUpload();
+    showToast('✅ Το αρχείο ανέβηκε επιτυχώς!');
+    if (idx === currentFolderIdx) renderDocs(await listFiles(folder), folder);
+  } catch(e) {
+    showToast('❌ Σφάλμα: ' + e.message, true);
+  } finally {
+    btn.disabled = false; btn.innerHTML = 'Ανέβασμα';
+  }
+}
+
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show'+(isError?' error':'');
+  setTimeout(() => t.className = '', 3600);
+}
+
+document.getElementById('searchInput').addEventListener('input', e => renderFolders(e.target.value));
+document.getElementById('yr').textContent = new Date().getFullYear();
+renderFolders();
+</script>
+</body>
+</html>
