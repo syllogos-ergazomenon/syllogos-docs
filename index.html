@@ -230,7 +230,7 @@ let isAdmin = false, currentFolderIdx = null, selectedFile = null;
 
 /* ── VIEWS ── */
 function showFolderView() {
-  document.getElementById('view-folders').style.display = '';
+  document.getElementById('view-folders').style.display = 'block';
   document.getElementById('view-docs').style.display = 'none';
   document.getElementById('searchWrap').style.display = '';
   document.getElementById('upload-btn').classList.remove('show');
@@ -241,7 +241,7 @@ function showDocView(idx) {
   currentFolderIdx = idx;
   const f = FOLDERS[idx];
   document.getElementById('view-folders').style.display = 'none';
-  document.getElementById('view-docs').style.display = '';
+  document.getElementById('view-docs').style.display = 'block';
   document.getElementById('searchWrap').style.display = 'none';
   document.getElementById('docTitle').textContent = f.icon + ' ' + f.name;
   if (isAdmin) document.getElementById('upload-btn').classList.add('show');
@@ -255,12 +255,12 @@ function showDocView(idx) {
 
 /* ── NAVIGATION ── */
 function goToHome() {
-  history.pushState({ page: 'folders' }, '', window.location.pathname);
+  try { history.pushState({ page: 'folders' }, '', window.location.pathname); } catch(e) {}
   showFolderView();
 }
 
 function openFolder(idx) {
-  history.pushState({ page: 'folder', idx }, '', '#folder-' + idx);
+  try { history.pushState({ page: 'folder', idx }, '', '#folder-' + idx); } catch(e) {}
   showDocView(idx);
 }
 
@@ -363,7 +363,7 @@ document.getElementById('searchInput').addEventListener('input',e=>renderFolders
 document.getElementById('yr').textContent=new Date().getFullYear();
 
 /* ── INIT ── */
-history.replaceState({ page: 'folders' }, '', window.location.pathname);
+try { history.replaceState({ page: 'folders' }, '', window.location.pathname); } catch(e) {}
 showFolderView();
 </script>
 </body>
