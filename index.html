@@ -618,6 +618,11 @@ let isAdmin = false;
 let currentFolderIdx = null;
 let selectedFile = null;
 
+function goToHome() {
+  document.getElementById('view-folders').style.display = 'block';
+  document.getElementById('view-docs').style.display = 'none';
+}
+
 function showFolderView() {
 
   document.getElementById('view-folders').style.display = 'block';
@@ -640,9 +645,11 @@ function showDocView(idx) {
   document.getElementById('docTitle').textContent =
   f.icon + ' ' + f.name;
 
-  if(isAdmin)
+ if(isAdmin) {
     document.getElementById('upload-btn').classList.add('show');
-
+  } else {
+    document.getElementById('upload-btn').classList.remove('show');
+  }
   listFiles(f.folder)
     .then(files => renderDocs(files, f.folder));
 
