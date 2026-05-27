@@ -19,6 +19,7 @@
       --muted: #7a7060;
       --border: #e0d8c8;
       --green: #2d6a4f;
+      --danger: #b3261e;
     }
     body { font-family: 'Noto Serif', Georgia, serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
     body::before {
@@ -114,6 +115,7 @@
     .doc-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.8rem; flex-wrap: wrap; }
     .back-btn { padding: 0.5rem 1rem; border: 1px solid var(--border); background: white; cursor: pointer; }
     .doc-title { font-family: 'Marcellus', serif; font-size: 1.4rem; flex: 1; }
+
     #upload-btn {
       display: none;
       background: var(--rust);
@@ -139,6 +141,7 @@
     .doc-icon { width: 40px; height: 48px; display: flex; align-items: center; justify-content: center; background: var(--cream); border: 1px solid var(--border); }
     .doc-info { flex: 1; min-width: 0; }
     .doc-name { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .doc-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
 
     .empty { text-align: center; padding: 3rem; background: white; border: 1px dashed var(--border); }
 
@@ -153,11 +156,25 @@
     }
     #login-overlay.open, #modal-overlay.open { display: flex; }
 
-    .modal-box { background: var(--paper); border-top: 4px solid var(--rust); width: min(480px, 94vw); padding: 2rem; }
+    .modal-box { background: var(--paper); border-top: 4px solid var(--rust); width: min(520px, 94vw); padding: 2rem; }
     .modal-box input, .modal-box select { width: 100%; padding: 0.55rem 0.8rem; margin-bottom: 1rem; }
 
-    .drop-zone { border: 2px dashed var(--border); padding: 2rem; text-align: center; cursor: pointer; }
+    .drop-zone {
+      border: 2px dashed var(--border);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: 0.15s;
+      background: rgba(255,255,255,0.65);
+    }
+    .drop-zone.dragover {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(45,106,79,0.15);
+      transform: translateY(-1px);
+    }
     .drop-zone input { display: none; }
+    .drop-hint { margin-top: 0.6rem; font-size: 0.8rem; color: var(--muted); }
 
     .modal-actions { display: flex; gap: 0.7rem; justify-content: flex-end; margin-top: 1rem; }
     .btn-primary { background: var(--rust); color: white; border: none; padding: 0.5rem 1.2rem; cursor: pointer; }
@@ -232,7 +249,7 @@
   <div class="modal-box">
     <h3>🔐 Σύνδεση Διαχειριστή</h3>
     <input type="password" id="pwd-input" placeholder="Κωδικός" onkeydown="if(event.key==='Enter')doLogin()">
-    <div id="login-err"></div>
+    <div id="login-err" style="color:var(--danger); margin-bottom:0.5rem;"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="document.getElementById('login-overlay').classList.remove('open')">Ακύρωση</button>
       <button class="btn-primary" onclick="doLogin()">Σύνδεση</button>
@@ -243,14 +260,19 @@
 <div id="modal-overlay">
   <div class="modal-box">
     <h3>📤 Ανέβασμα εγγράφου</h3>
+
     <select id="upload-folder-select"></select>
+
     <input type="text" id="upload-title" placeholder="Προαιρετικός τίτλος">
-    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+
+    <div class="drop-zone" id="drop-zone">
       <input type="file" id="file-input"
         accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
         onchange="handleFile(this)">
       <div id="drop-text">📂 Επιλέξτε αρχείο</div>
+      <div class="drop-hint">Μπορείς και drag & drop εδώ</div>
     </div>
+
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeUpload()">Ακύρωση</button>
       <button class="btn-primary" id="do-upload-btn" onclick="doUpload()" disabled>Ανέβασμα</button>
@@ -262,8 +284,11 @@
 
 <script>
   const SUPABASE_URL = 'https://sjmmesnkpbeziyyrtvgo.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqbW1lc25rcGJleml5eXJ0dmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODQ3MjAsImV4cCI6MjA5NTM2MDcyMH0.o0lpEIsAfz0h46vQdZH9Bma5niq1qyqV0UZNYFQ7K24'; // anon public (eyJ...)
+  const SUPABASE_ANON = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE'; // anon public (eyJ...)
   const BUCKET = 'eggrafa';
+
+  // Σημείωση ασφάλειας: αυτός ο κωδικός στο frontend δεν είναι πραγματική ασφάλεια.
+  // Οποιοσδήποτε δει το JS μπορεί να τον βρει. Για αληθινή ασφάλεια θέλει Supabase Auth + policies.
   const ADMIN_PASS = 'P@ssw0rd,.';
 
   const FOLDERS = [
@@ -284,6 +309,9 @@
   let currentFolderIdx = null;
   let selectedFile = null;
 
+  // Cache για αποφυγή διπλών ονομάτων
+  const folderIndex = new Map(); // folder -> { byDisplayLower: Map<string, storedName> }
+
   // -------------------------
   // Helpers: base64url UTF-8
   // -------------------------
@@ -302,13 +330,13 @@
     return new TextDecoder().decode(bytes);
   }
 
-  // Storage key format: u_<b64url(nameWithoutExt)>.<ext>
   function splitNameAndExt(displayName) {
     const i = displayName.lastIndexOf('.');
     if (i <= 0 || i === displayName.length - 1) return { base: displayName, ext: '' };
     return { base: displayName.slice(0, i), ext: displayName.slice(i + 1) };
   }
 
+  // Storage key format: u_<b64url(nameWithoutExt)>.<ext>
   function toStoredKey(displayName) {
     const { base, ext } = splitNameAndExt(displayName);
     const encodedBase = b64urlEncodeUtf8(base);
@@ -333,6 +361,72 @@
     return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
   }
 
+  function formatBytes(bytes) {
+    if (bytes == null || isNaN(bytes)) return '';
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    let b = Number(bytes);
+    let u = 0;
+    while (b >= 1024 && u < units.length - 1) { b /= 1024; u++; }
+    return `${b.toFixed(b >= 10 || u === 0 ? 0 : 1)} ${units[u]}`;
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleString('el-GR', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+  }
+
+  function sanitizeDisplayName(name) {
+    return String(name)
+      .replace(/[^\p{L}\p{N}\s._-]/gu,'')
+      .replace(/\s+/g,'_')
+      .trim();
+  }
+
+  function ensureExtension(displayName, fallbackExt) {
+    const { ext } = splitNameAndExt(displayName);
+    if (ext) return displayName;
+    return fallbackExt ? `${displayName}.${fallbackExt}` : displayName;
+  }
+
+  function buildFolderIndex(folder, files) {
+    const byDisplayLower = new Map();
+    for (const f of files) {
+      const storedName = f.name;
+      const displayName = fromStoredKey(storedName);
+      byDisplayLower.set(displayName.toLowerCase(), storedName);
+    }
+    folderIndex.set(folder, { byDisplayLower });
+  }
+
+  function pickNonDuplicateDisplayName(folder, displayName) {
+    const idx = folderIndex.get(folder);
+    if (!idx) return displayName;
+
+    const lower = displayName.toLowerCase();
+    if (!idx.byDisplayLower.has(lower)) return displayName;
+
+    // Αν υπάρχει, φτιάχνουμε (2), (3), ...
+    const { base, ext } = splitNameAndExt(displayName);
+    let n = 2;
+    while (true) {
+      const candidate = ext ? `${base} (${n}).${ext}` : `${base} (${n})`;
+      if (!idx.byDisplayLower.has(candidate.toLowerCase())) return candidate;
+      n++;
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show';
+    setTimeout(()=>{ t.className=''; }, 3500);
+  }
+
+  // -------------------------
+  // Navigation / Rendering
+  // -------------------------
   function goToHome() {
     document.getElementById('view-folders').style.display = 'block';
     document.getElementById('view-docs').style.display = 'none';
@@ -377,6 +471,9 @@
       });
   }
 
+  // -------------------------
+  // Supabase Storage calls
+  // -------------------------
   async function listFiles(folder) {
     const r = await fetch(
       `${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`,
@@ -390,7 +487,17 @@
         body:JSON.stringify({ prefix: folder + '/', limit: 100 })
       }
     );
-    return await r.json();
+
+    const data = await r.json();
+
+    // Μερικές φορές επιστρέφει error object
+    if (!r.ok) throw new Error(typeof data === 'string' ? data : JSON.stringify(data));
+
+    // Φτιάχνουμε index για duplicates
+    buildFolderIndex(folder, data);
+
+    // Sort newest first (αν υπάρχει updated_at)
+    return data.sort((a,b) => String(b.updated_at || '').localeCompare(String(a.updated_at || '')));
   }
 
   function fileUrl(folder, storedName) {
@@ -410,6 +517,9 @@
       const storedName = f.name;
       const displayName = fromStoredKey(storedName);
 
+      const size = f.metadata && (f.metadata.size ?? f.metadata.contentLength);
+      const updated = f.updated_at || f.created_at;
+
       const li = document.createElement('li');
       li.innerHTML = `
         <div class="doc-item">
@@ -418,14 +528,17 @@
             <div class="doc-icon">📄</div>
             <div class="doc-info">
               <div class="doc-name">${displayName}</div>
+              <div class="doc-meta">
+                ${formatBytes(size)}${size ? ' · ' : ''}${formatDate(updated)}
+              </div>
             </div>
           </a>
 
           ${
             isAdmin
               ? `
-                <button onclick="renameFile('${folder}','${escapeJsString(storedName)}')">✏️</button>
-                <button onclick="deleteFile('${folder}','${escapeJsString(storedName)}')">🗑️</button>
+                <button title="Μετονομασία" onclick="renameFile('${folder}','${escapeJsString(storedName)}')">✏️</button>
+                <button title="Διαγραφή" onclick="deleteFile('${folder}','${escapeJsString(storedName)}')">🗑️</button>
               `
               : ''
           }
@@ -435,6 +548,9 @@
     });
   }
 
+  // -------------------------
+  // Upload Modal + Drag & Drop
+  // -------------------------
   function openUpload() {
     const sel = document.getElementById('upload-folder-select');
     sel.innerHTML = '';
@@ -451,6 +567,7 @@
     document.getElementById('upload-title').value = '';
     document.getElementById('drop-text').textContent = '📂 Επιλέξτε αρχείο';
     document.getElementById('do-upload-btn').disabled = true;
+
     document.getElementById('modal-overlay').classList.add('open');
   }
 
@@ -458,12 +575,14 @@
     document.getElementById('modal-overlay').classList.remove('open');
   }
 
+  function setSelectedFile(file) {
+    selectedFile = file;
+    document.getElementById('drop-text').textContent = '✅ ' + file.name;
+    document.getElementById('do-upload-btn').disabled = false;
+  }
+
   function handleFile(input) {
-    if (input.files[0]) {
-      selectedFile = input.files[0];
-      document.getElementById('drop-text').textContent = '✅ ' + selectedFile.name;
-      document.getElementById('do-upload-btn').disabled = false;
-    }
+    if (input.files && input.files[0]) setSelectedFile(input.files[0]);
   }
 
   async function doUpload() {
@@ -472,18 +591,35 @@
     const idx = parseInt(document.getElementById('upload-folder-select').value, 10);
     const folder = FOLDERS[idx].folder;
 
+    // Load existing list (για duplicates) αν δεν υπάρχει στο cache
+    let existing = null;
+    try {
+      existing = await listFiles(folder);
+    } catch {
+      // αν αποτύχει η λίστα, συνεχίζουμε upload (χωρίς duplicate check)
+    }
+
     const customTitle = document.getElementById('upload-title').value.trim();
     const originalExt = selectedFile.name.split('.').pop();
 
-    // Επιτρέπουμε ελληνικά, αφαιρούμε chars που σπάνε paths
-    const safeDisplayName = (customTitle || selectedFile.name)
-      .replace(/[^\p{L}\p{N}\s._-]/gu,'')
-      .replace(/\s+/g,'_');
+    let displayName = sanitizeDisplayName(customTitle || selectedFile.name);
+    displayName = ensureExtension(displayName, originalExt);
 
-    const displayName =
-      safeDisplayName.toLowerCase().endsWith('.' + originalExt.toLowerCase())
-        ? safeDisplayName
-        : safeDisplayName + '.' + originalExt;
+    // Duplicate handling
+    let upsert = false;
+    if (existing) {
+      const idxMap = folderIndex.get(folder);
+      const exists = idxMap && idxMap.byDisplayLower.has(displayName.toLowerCase());
+
+      if (exists) {
+        const replace = confirm('Υπάρχει ήδη αρχείο με το ίδιο όνομα.\n\nOK: Αντικατάσταση\nCancel: Αυτόματο νέο όνομα (2), (3), ...');
+        if (replace) {
+          upsert = true;
+        } else {
+          displayName = pickNonDuplicateDisplayName(folder, displayName);
+        }
+      }
+    }
 
     const storedName = toStoredKey(displayName);
     const encodedStoredName = encodeURIComponent(storedName);
@@ -497,19 +633,21 @@
             'Authorization':`Bearer ${SUPABASE_ANON}`,
             'apikey':SUPABASE_ANON,
             'Content-Type': selectedFile.type || 'application/octet-stream',
-            'x-upsert':'true'
+            'x-upsert': upsert ? 'true' : 'false'
           },
           body: selectedFile
         }
       );
 
-      if (!r.ok) throw new Error(await r.text());
+      const txt = await r.text();
+      if (!r.ok) throw new Error(txt);
 
       closeUpload();
-      showToast('✅ Το αρχείο ανέβηκε');
+      showToast('Το αρχείο ανέβηκε');
+
       renderDocs(await listFiles(folder), folder);
     } catch(e) {
-      showToast('❌ ' + (e && e.message ? e.message : String(e)), true);
+      showToast('Σφάλμα: ' + (e && e.message ? e.message : String(e)));
     }
   }
 
@@ -530,12 +668,13 @@
         }
       );
 
-      if (!r.ok) throw new Error(await r.text());
+      const txt = await r.text();
+      if (!r.ok) throw new Error(txt);
 
-      showToast('🗑️ Διαγράφηκε');
+      showToast('Διαγράφηκε');
       renderDocs(await listFiles(folder), folder);
     } catch(e) {
-      showToast('❌ ' + (e && e.message ? e.message : String(e)), true);
+      showToast('Σφάλμα: ' + (e && e.message ? e.message : String(e)));
     }
   }
 
@@ -552,19 +691,21 @@
     const rawInput = prompt('Νέο όνομα:', oldDisplay);
     if (!rawInput) return;
 
-    let newDisplay = rawInput.trim();
+    let newDisplay = sanitizeDisplayName(rawInput.trim());
     if (!newDisplay) return;
 
-    const hasExt = (() => {
-      const i = newDisplay.lastIndexOf('.');
-      return i > 0 && i < newDisplay.length - 1;
-    })();
-
-    if (!hasExt && oldExt) {
-      newDisplay = `${newDisplay}.${oldExt}`;
-    }
+    newDisplay = ensureExtension(newDisplay, oldExt);
 
     if (newDisplay === oldDisplay) return;
+
+    // Duplicate handling on rename
+    await listFiles(folder);
+    const idxMap = folderIndex.get(folder);
+    if (idxMap && idxMap.byDisplayLower.has(newDisplay.toLowerCase())) {
+      const ok = confirm('Υπάρχει ήδη αρχείο με αυτό το όνομα.\n\nΘέλεις να γίνει αυτόματο suffix (2), (3), ...;');
+      if (!ok) return;
+      newDisplay = pickNonDuplicateDisplayName(folder, newDisplay);
+    }
 
     const newStoredName = toStoredKey(newDisplay);
 
@@ -586,27 +727,25 @@
         }
       );
 
-      if (!r.ok) throw new Error(await r.text());
+      const txt = await r.text();
+      if (!r.ok) throw new Error(txt);
 
-      showToast('✏️ Μετονομάστηκε');
+      showToast('Μετονομάστηκε');
       renderDocs(await listFiles(folder), folder);
     } catch(e) {
-      showToast('❌ ' + (e && e.message ? e.message : String(e)), true);
+      showToast('Σφάλμα: ' + (e && e.message ? e.message : String(e)));
     }
   }
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'show';
-    setTimeout(()=>{ t.className=''; }, 3500);
-  }
-
+  // -------------------------
+  // Admin login
+  // -------------------------
   function doLogin() {
     if (document.getElementById('pwd-input').value === ADMIN_PASS) {
       isAdmin = true;
       document.getElementById('login-overlay').classList.remove('open');
       document.getElementById('admin-bar').classList.add('show');
+      document.getElementById('login-err').textContent = '';
       if (currentFolderIdx !== null) showDocView(currentFolderIdx);
     } else {
       document.getElementById('login-err').textContent = 'Λάθος κωδικός';
@@ -619,6 +758,9 @@
     showToast('Αποσυνδεθήκατε');
   }
 
+  // -------------------------
+  // Init + Drag&Drop wiring
+  // -------------------------
   document.getElementById('logoBtn').addEventListener('click',()=>{
     let clicks = parseInt(sessionStorage.getItem('clicks') || '0', 10);
     clicks++;
@@ -634,6 +776,27 @@
   });
 
   document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Click to pick file
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  // Drag & drop
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+  });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) setSelectedFile(file);
+  });
+
   showFolderView();
 </script>
 </body>
