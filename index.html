@@ -70,8 +70,8 @@
 
     /* DOC VIEW */
     .doc-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.8rem; flex-wrap: wrap; }
-    .back-btn { display: inline-flex; align-items: center; gap: 0.4rem; background: none; border: 1px solid var(--border); border-radius: 4px; padding: 0.45rem 0.9rem; font-family: inherit; font-size: 0.85rem; cursor: pointer; transition: background 0.2s; color: var(--ink); }
-    .back-btn:hover { background: var(--cream); }
+    .back-btn { display: inline-flex; align-items: center; gap: 0.4rem; background: none; border: 1px solid var(--border); border-radius: 4px; padding: 0.5rem 1rem; font-family: inherit; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: all 0.2s; color: var(--ink); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .back-btn:hover { background: var(--cream); border-color: var(--gold); transform: translateY(-1px); }
     .doc-title { font-family: 'Marcellus', serif; font-size: 1.4rem; flex: 1; }
     #upload-btn { display: none; align-items: center; gap: 0.5rem; background: var(--rust); color: white; border: none; border-radius: 25px; padding: 0.6rem 1.4rem; font-family: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 10px rgba(139,58,42,0.3); }
     #upload-btn.show { display: flex; }
@@ -155,7 +155,7 @@
 
   <div id="view-docs">
     <div class="doc-header">
-      <button class="back-btn" onclick="goBack()">← Πίσω</button>
+      <button class="back-btn" onclick="goToHome()">← Επιστροφή στην αρχική σελίδα</button>
       <div class="doc-title" id="docTitle"></div>
       <button id="upload-btn" onclick="openUpload()">
         <span class="plus">+</span> Ανέβασμα αρχείου
@@ -253,8 +253,11 @@ function showDocView(idx) {
   });
 }
 
-/* ── HASH NAVIGATION (browser back/forward) ── */
-function goBack() { history.back(); }
+/* ── NAVIGATION ── */
+function goToHome() {
+  history.pushState({ page: 'folders' }, '', window.location.pathname);
+  showFolderView();
+}
 
 function openFolder(idx) {
   history.pushState({ page: 'folder', idx }, '', '#folder-' + idx);
@@ -360,7 +363,7 @@ document.getElementById('searchInput').addEventListener('input',e=>renderFolders
 document.getElementById('yr').textContent=new Date().getFullYear();
 
 /* ── INIT ── */
-history.replaceState({ page: 'folders' }, '', window.location.href);
+history.replaceState({ page: 'folders' }, '', window.location.pathname);
 showFolderView();
 </script>
 </body>
