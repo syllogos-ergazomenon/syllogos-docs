@@ -617,34 +617,34 @@ let isAdmin = false;
 let currentFolderIdx = null;
 let selectedFile = null;
 
-function showFolderView() {
-
+// ΠΡΟΣΘΕΣΕ ΑΥΤΗ ΤΗ ΣΥΝΑΡΤΗΣΗ
+function goToHome() {
   document.getElementById('view-folders').style.display = 'block';
-
   document.getElementById('view-docs').style.display = 'none';
+}
 
+function showFolderView() {
+  document.getElementById('view-folders').style.display = 'block';
+  document.getElementById('view-docs').style.display = 'none';
   renderFolders();
 }
 
 function showDocView(idx) {
-
   currentFolderIdx = idx;
-
   const f = FOLDERS[idx];
-
   document.getElementById('view-folders').style.display = 'none';
-
   document.getElementById('view-docs').style.display = 'block';
-
-  document.getElementById('docTitle').textContent =
-  f.icon + ' ' + f.name;
-
-  if(isAdmin)
+  document.getElementById('docTitle').textContent = f.icon + ' ' + f.name;
+  
+  // Εμφάνιση κουμπιού upload μόνο αν είσαι admin
+  if(isAdmin) {
     document.getElementById('upload-btn').classList.add('show');
+  } else {
+    document.getElementById('upload-btn').classList.remove('show');
+  }
 
   listFiles(f.folder)
     .then(files => renderDocs(files, f.folder));
-
 }
 
 function renderFolders(filter='') {
