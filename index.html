@@ -157,7 +157,10 @@
 
 <script>
   const SUPABASE_URL = 'https://sjmmesnkpbeziyyrtvgo.supabase.co';
-  const SUPABASE_ANON = 'ΤΟ_ANON_KEY_ΣΟΥ_ΕΔΩ'; 
+  
+  // ΤΟ ΚΛΕΙΔΙ ΣΟΥ ΕΧΕΙ ΜΠΕΙ ΕΔΩ ΑΥΤΟΜΑΤΑ:
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqbW1lc25rcGJleml5eXJ0dmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODQ3MjAsImV4cCI6MjA5NTM2MDcyMH0.o0lpEIsAfz0h46vQdZH9Bma5niq1qyqV0UZNYFQ7K24'; 
+  
   const BUCKET = 'eggrafa';
   const ADMIN_PASS = 'P@ssw0rd,.';
 
@@ -177,7 +180,7 @@
 
   let isAdmin = false;
   let currentFolderIdx = null;
-  let currentSubPath = ''; // Νέα μεταβλητή για το βάθος του φακέλου!
+  let currentSubPath = ''; 
   let selectedFile = null;
   let cachedFiles = [];
 
@@ -200,8 +203,6 @@
     if (i<=0||i===n.length-1) return {base:n,ext:''};
     return {base:n.slice(0,i),ext:n.slice(i+1)};
   }
-  
-  // Μεταφράζει ολόκληρη διαδρομή φακέλων σε ασφαλή base64
   function toStoredKey(displayNamePath) {
     return displayNamePath.split('/').map(seg => {
       if (!seg) return '';
@@ -210,7 +211,6 @@
       return ext ? `u_${enc}.${ext}` : `u_${enc}`;
     }).join('/');
   }
-  // Επαναφέρει την ασφαλή base64 διαδρομή σε κανονικά Ελληνικά
   function fromStoredKey(storedNamePath) {
     return storedNamePath.split('/').map(seg => {
       if (!seg || !seg.startsWith('u_')) return seg;
@@ -222,8 +222,6 @@
       catch { return seg; }
     }).join('/');
   }
-  
-  // Κωδικοποιεί τα slashes για το URL fetch (απαραίτητο για το Supabase)
   function encodePathForUrl(pathStr) { return pathStr.split('/').map(encodeURIComponent).join('/'); }
 
   function escapeJsString(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
@@ -269,7 +267,6 @@
     if (currentSubPath === '') {
       goToHome();
     } else {
-      // Αν είμαστε σε υποφάκελο, πάμε ένα επίπεδο πίσω!
       const parts = currentSubPath.split('/');
       parts.pop(); parts.pop();
       currentSubPath = parts.length > 0 ? parts.join('/') + '/' : '';
@@ -286,7 +283,7 @@
   }
   function showDocView(idx) {
     currentFolderIdx = idx;
-    currentSubPath = ''; // Μηδενισμός διαδρομής
+    currentSubPath = ''; 
     refreshDocs();
   }
   function renderFolders(filter='') {
@@ -307,11 +304,9 @@
     document.getElementById('view-folders').style.display='none';
     document.getElementById('view-docs').style.display='block';
     
-    // Τίτλος: Κεντρικός Φάκελος -> Υποφάκελος
     const pathTitle = currentSubPath ? ` / ${currentSubPath.replace(/\/$/, '')}` : '';
     document.getElementById('docTitle').textContent = f.icon + ' ' + f.name + pathTitle;
     
-    // Κουμπιά Admin
     document.getElementById('upload-btn').style.display = isAdmin ? 'flex' : 'none';
     document.getElementById('new-folder-btn').style.display = isAdmin ? 'block' : 'none';
 
@@ -324,11 +319,10 @@
       const data = await r.json();
       if(!r.ok) throw new Error();
       
-      // Περνάμε τα πάντα από το base64 αποκωδικοποιητή για να τα δουλεύουμε στα Ελληνικά
       cachedFiles = data.map(file => ({ ...file, displayName: fromStoredKey(file.name) }));
       renderDocsView();
     } catch {
-      document.getElementById('docList').innerHTML = '<li class="empty">⚠️ Σφάλμα φόρτωσης.</li>';
+      document.getElementById('docList').innerHTML = '<li class="empty">⚠️ Σφάλμα φόρτωσης. Δοκιμάστε ξανά.</li>';
     }
   }
 
@@ -338,12 +332,11 @@
     const folder = FOLDERS[currentFolderIdx].folder;
     const items = new Map();
 
-    // Διαχωρισμός Φακέλων - Αρχείων βάσει του currentSubPath
     cachedFiles.forEach(f => {
       const path = f.displayName;
       if (path.startsWith(currentSubPath)) {
         const rest = path.slice(currentSubPath.length);
-        if (rest === '' || rest === '.keep') return; // Αγνοούμε τα "φαντάσματα"
+        if (rest === '' || rest === '.keep') return;
         const slashIdx = rest.indexOf('/');
         
         if (slashIdx === -1) {
@@ -357,7 +350,6 @@
 
     if (items.size === 0) { list.innerHTML = '<li class="empty">Ο φάκελος είναι άδειος.</li>'; return; }
 
-    // Ταξινόμηση: Πρώτα οι Φάκελοι, μετά τα Αρχεία Αλφαβητικά
     const sorted = Array.from(items.values()).sort((a,b) => {
       if(a.type !== b.type) return a.type === 'folder' ? -1 : 1;
       return a.name.localeCompare(b.name);
@@ -407,7 +399,7 @@
 
   function enterSubFolder(name) { currentSubPath += name + '/'; refreshDocs(); }
 
-  /* ── Υπο-Φάκελοι: Δημιουργία, Μετονομασία, Διαγραφή ── */
+  /* ── Υπο-Φάκελοι ── */
   async function createFolder() {
     const raw = prompt('Όνομα νέου φακέλου:');
     if(!raw) return;
@@ -468,7 +460,7 @@
     refreshDocs();
   }
 
-  /* ── Αρχεία: Upload, Rename, Delete ── */
+  /* ── Αρχεία ── */
   function openUpload() {
     const sel = document.getElementById('upload-folder-select');
     sel.innerHTML = '';
@@ -494,7 +486,6 @@
     let displayName = sanitizeDisplayName(customTitle||selectedFile.name);
     displayName = ensureExtension(displayName, originalExt);
     
-    // Προσθέτουμε την τρέχουσα διαδρομή (υποφάκελο) στο όνομα!
     const fullDisplayPath = currentSubPath + displayName;
     const storedName = toStoredKey(fullDisplayPath);
     
@@ -522,7 +513,7 @@
 
   async function renameFile(folder, oldStoredName) {
     const oldDisplayFull = fromStoredKey(oldStoredName);
-    const oldDisplay = oldDisplayFull.slice(currentSubPath.length); // Κρατάμε μόνο το όνομα αρχείου, όχι όλο το path
+    const oldDisplay = oldDisplayFull.slice(currentSubPath.length); 
     const oldExt = oldDisplay.split('.').pop();
     
     const rawInput = prompt('Νέο όνομα:', oldDisplay);
