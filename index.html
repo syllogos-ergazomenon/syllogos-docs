@@ -114,6 +114,45 @@
     
     footer { background: var(--cream); padding: 3rem 1rem; text-align: center; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; margin-top: auto; }
     @media (max-width:768px) { .header-logo-image { position: static; display: block; margin: 0 auto 1.5rem; height: 75px; } header { padding-top: 2rem; } .doc-actions { opacity: 1; } }
+
+    /* =========================================
+       ✨ PREMIUM ΕΙΚΑΣΤΙΚΕΣ ΒΕΛΤΙΩΣΕΙΣ ✨
+       ========================================= */
+
+    /* 1. Custom Scrollbar (Μπάρα Κύλισης) */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--paper); border-left: 1px solid var(--border); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 5px; border: 2px solid var(--paper); transition: background 0.3s; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--rust); }
+
+    /* 2. Custom Text Selection (Χρώμα Μαρκαρίσματος) */
+    ::selection { background: var(--gold); color: var(--ink); text-shadow: none; }
+    ::-moz-selection { background: var(--gold); color: var(--ink); text-shadow: none; }
+
+    /* 3. Δυναμικό Search Bar (Focus Scale) */
+    .search-container { transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    .search-container:focus-within { transform: scale(1.03); z-index: 10; }
+    
+    /* 4. Pulse Animation (Για φορτώσεις και κενά μηνύματα) */
+    .loading, .empty { animation: pulseFade 2s infinite ease-in-out; }
+    @keyframes pulseFade {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    /* 5. Ομαλότερη εμφάνιση καρτών (Staggered Fade-in) */
+    .folder-card { animation: cardEnter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+    .folder-card:nth-child(1) { animation-delay: 0.05s; }
+    .folder-card:nth-child(2) { animation-delay: 0.10s; }
+    .folder-card:nth-child(3) { animation-delay: 0.15s; }
+    .folder-card:nth-child(4) { animation-delay: 0.20s; }
+    .folder-card:nth-child(5) { animation-delay: 0.25s; }
+    .folder-card:nth-child(6) { animation-delay: 0.30s; }
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
   </style>
 </head>
 
