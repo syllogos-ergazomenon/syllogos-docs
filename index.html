@@ -276,7 +276,7 @@
     if(isNaN(d.getTime())) return '';
     return d.toLocaleString('el-GR',{year:'numeric',month:'short',day:'numeric'});
   }
-  function sanitizeDisplayName(name) { return String(name).replace(/[^\p{L}\p{N}\s._-]/gu,'').replace(/\s+/g,'_').trim(); }
+  function sanitizeDisplayName(name) { return String(name).replace(/[^\p{L}\p{N}\s._-]/gu,'').trim(); }
   function ensureExtension(displayName,fallbackExt) {
     const {ext}=splitNameAndExt(displayName);
     if(ext) return displayName;
