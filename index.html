@@ -8,14 +8,12 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
-    /* Βασικά Χρώματα (Φωτεινό Θέμα) */
     :root {
       --ink: #1a1410; --paper: #fdfcf9; --cream: #f2ece0;
       --rust: #8b3a2a; --gold: #c9a84c; --muted: #7a7060;
       --border: #e0d8c8; --green: #2d6a4f; --danger: #b3261e;
     }
     
-    /* DARK MODE: Χρώματα Σκοτεινού Θέματος */
     body.dark-theme {
       --ink: #fdfcf9; --paper: #16120e; --cream: #251e17;
       --border: #3a3025; --muted: #a49885;
@@ -29,34 +27,13 @@
     #admin-bar .ab-label { flex: 1; font-style: italic; font-family: 'Noto Serif', serif; color: #9a8868; }
     #admin-bar button { background: none; border: 1px solid #6a5a40; border-radius: 3px; color: #f0ead8; padding: 0.28rem 0.75rem; cursor: pointer; font-family: inherit; font-size: 0.76rem; }
     
-    /* ΝΕΟ ΔΥΝΑΜΙΚΟ HEADER ΠΟΥ "ΑΝΑΠΝΕΕΙ" */
-    header { 
-      position: relative; 
-      z-index: 1; 
-      background: linear-gradient(-45deg, #1a1410, #2c1a14, #1f1b13, #301712);
-      background-size: 400% 400%;
-      animation: gradientBreath 15s ease infinite;
-      color: #fdfcf9; 
-      text-align: center; 
-      padding: 3.5rem 1.5rem 3rem; 
-      border-bottom: 5px solid var(--gold); 
-      overflow: hidden; 
-      cursor: pointer;
-      transition: filter 0.3s ease;
-    }
-    
+    header { position: relative; z-index: 1; background: linear-gradient(-45deg, #1a1410, #2c1a14, #1f1b13, #301712); background-size: 400% 400%; animation: gradientBreath 15s ease infinite; color: #fdfcf9; text-align: center; padding: 3.5rem 1.5rem 3rem; border-bottom: 5px solid var(--gold); overflow: hidden; cursor: pointer; transition: filter 0.3s ease; }
     header:active { filter: brightness(1.3); }
-
-    @keyframes gradientBreath {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+    @keyframes gradientBreath { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
     .header-logo-image { position: absolute; top: 1.2rem; left: 1.8rem; height: 90px; width: auto; cursor: pointer; }
     .masthead-rule { width: 60px; height: 2px; background: var(--gold); margin: 0 auto 1rem; }
     
-    /* Κουμπί Εναλλαγής Θέματος (Dark Mode) */
     .theme-toggle { position: absolute; top: 1.5rem; right: 2rem; background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 0.5rem 1rem; border-radius: 25px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 500; transition: 0.3s; z-index: 10; display: flex; align-items: center; gap: 0.4rem; }
     .theme-toggle:hover { background: var(--gold); color: #1a1410; }
     
@@ -78,11 +55,15 @@
     .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
     
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.8rem; }
+    
+    /* ΝΕΟ: .folder-card.dragover για το Drag&Drop στους φακέλους */
     .folder-card { background: var(--paper); border: 1px solid var(--border); border-top: 5px solid var(--rust); border-radius: 8px; padding: 2.8rem 1.5rem; cursor: pointer; text-align: center; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); animation: cardEnter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+    .folder-card.dragover { border-color: var(--green); background: rgba(45, 106, 79, 0.05); transform: scale(1.03); box-shadow: 0 10px 30px rgba(45, 106, 79, 0.15); border-top-color: var(--green); }
+    
     .folder-card:nth-child(1) { animation-delay: 0.05s; } .folder-card:nth-child(2) { animation-delay: 0.10s; } .folder-card:nth-child(3) { animation-delay: 0.15s; } .folder-card:nth-child(4) { animation-delay: 0.20s; }
     @keyframes cardEnter { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
     
-    .folder-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-top-color: var(--gold); }
+    .folder-card:hover:not(.dragover) { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-top-color: var(--gold); }
     .f-icon { font-size: 3.5rem; transition: transform 0.3s; }
     .folder-card:hover .f-icon { transform: scale(1.1); }
     .f-name { margin-top: 1.2rem; font-size: 1.25rem; }
@@ -95,7 +76,6 @@
     .back-btn:hover { background: var(--cream); border-color: var(--gold); transform: translateY(-1px); }
     .doc-title { font-size: 1.6rem; flex: 1; display: flex; align-items: center; flex-wrap: wrap; }
     
-    /* Ταξινόμηση & Προβολή (Toolbar) */
     .doc-toolbar { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-left: auto; }
     .sort-select { padding: 0.5rem 0.8rem; background: var(--paper); color: var(--ink); border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.85rem; cursor: pointer; outline: none; transition: 0.2s; }
     .sort-select:focus, .sort-select:hover { border-color: var(--gold); }
@@ -112,7 +92,6 @@
     
     .doc-list { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
     
-    /* GRID VIEW (Προβολή Πλέγματος) */
     .doc-list.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.2rem; }
     .doc-list.grid-view .doc-item { flex-direction: column; align-items: center; text-align: center; padding: 1.8rem 1rem; position: relative; gap: 0.8rem; }
     .doc-list.grid-view .doc-icon { width: 64px; height: 64px; font-size: 2.2rem; }
@@ -125,10 +104,14 @@
     
     .doc-icon { width: 44px; min-width: 44px; height: 52px; display: flex; align-items: center; justify-content: center; background: var(--paper); border: 1px solid var(--border); border-radius: 4px; font-size: 1.4rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     .doc-info { flex: 1; min-width: 0; padding-top: 0.2rem; }
-    .doc-name { font-weight: 600; font-size: 1.05rem; white-space: normal; overflow-wrap: break-word; word-break: break-word; line-height: 1.4; color: var(--ink); transition: color 0.2s; }
+    .doc-name { font-weight: 600; font-size: 1.05rem; white-space: normal; overflow-wrap: break-word; word-break: break-word; line-height: 1.4; color: var(--ink); transition: color 0.2s; display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
     .doc-item:hover .doc-name { color: var(--rust); }
     .doc-meta { font-size: 0.8rem; color: var(--muted); margin-top: 0.4rem; }
     
+    /* ΝΕΟ: Badge για "ΝΕΟ!" αρχείο */
+    .badge-new { background: var(--danger); color: white; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: bold; letter-spacing: 0.05em; display: inline-block; line-height: 1; box-shadow: 0 2px 5px rgba(179,38,30,0.3); }
+    
+    /* Τροποποίηση για εμφάνιση ενεργειών (πλέον το 🔗 εμφανίζεται πάντα!) */
     .doc-actions { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; opacity: 0; transition: opacity 0.2s ease; }
     .doc-item:hover .doc-actions { opacity: 1; }
     .doc-actions button { background: var(--paper); border: 1px solid var(--border); color: var(--ink); cursor: pointer; font-size: 1rem; padding: 0.4rem; border-radius: 4px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -139,7 +122,6 @@
     
     #login-overlay, #modal-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
     #login-overlay.open, #modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     
     .modal-box { background: var(--paper); border-top: 5px solid var(--rust); border-radius: 8px; width: min(520px, 94vw); padding: 2.5rem; box-shadow: 0 25px 50px rgba(0,0,0,0.3); transform: translateY(0); animation: slideUp 0.3s ease; }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -295,7 +277,6 @@
   let selectedFile = null;
   let cachedFiles = [];
 
-  /* ── Dark Theme Logic ── */
   function toggleTheme() {
     const body = document.body;
     const isDark = body.classList.toggle('dark-theme');
@@ -304,7 +285,6 @@
   }
   if(localStorage.getItem('theme') === 'dark') toggleTheme();
 
-  /* ── View Mode Logic (List/Grid) ── */
   let currentViewMode = localStorage.getItem('viewMode') || 'list';
   function setViewMode(mode) {
     currentViewMode = mode;
@@ -322,7 +302,6 @@
     }
   }
 
-  /* ── Encoding / Decoding ── */
   function b64urlEncodeUtf8(str) {
     const bytes = new TextEncoder().encode(str);
     let bin = '';
@@ -394,6 +373,19 @@
     setTimeout(() => { t.classList.remove('show'); }, 3500);
   }
 
+  /* ── ΝΕΟ: Αντιγραφή Συνδέσμου ── */
+  function copyToClipboard(url) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(() => showToast('🔗 Ο σύνδεσμος αντιγράφηκε!')).catch(() => showToast('❌ Αποτυχία αντιγραφής.'));
+    } else {
+      const el = document.createElement('textarea');
+      el.value = url; document.body.appendChild(el); el.select();
+      try { document.execCommand('copy'); showToast('🔗 Ο σύνδεσμος αντιγράφηκε!'); } 
+      catch (err) { showToast('❌ Αποτυχία αντιγραφής.'); }
+      document.body.removeChild(el);
+    }
+  }
+
   /* ── Πλοήγηση ── */
   function goBack() {
     if (pathStack.length === 0) { goToHome(); } 
@@ -420,13 +412,47 @@
   function renderFolders(filter='') {
     const grid=document.getElementById('folderGrid');
     grid.innerHTML='';
-    FOLDERS.filter(f=>f.name.toLowerCase().includes(filter.toLowerCase())).forEach(f=>{
+    FOLDERS.filter(f=>f.name.toLowerCase().includes(filter.toLowerCase())).forEach((f, i)=>{
       const card=document.createElement('div');
       card.className='folder-card';
       card.innerHTML=`<div class="f-icon">${f.icon}</div><div class="f-name">${f.name}</div><div class="f-action">Άνοιγμα ↗</div>`;
       card.onclick=()=>showDocView(FOLDERS.indexOf(f));
+      
+      /* ΝΕΟ: Drag & Drop απευθείας στην Κάρτα Φακέλου */
+      card.ondragover = (e) => { e.preventDefault(); card.classList.add('dragover'); };
+      card.ondragleave = (e) => { card.classList.remove('dragover'); };
+      card.ondrop = (e) => {
+        e.preventDefault();
+        card.classList.remove('dragover');
+        if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+          quickUpload(e.dataTransfer.files[0], f);
+        }
+      };
+      
       grid.appendChild(card);
     });
+  }
+
+  /* ΝΕΟ: Γρήγορο Ανέβασμα από Drag&Drop */
+  async function quickUpload(file, folderObj) {
+    if(!isAdmin) return showToast('🔒 Απαιτείται σύνδεση διαχειριστή για ανέβασμα αρχείων!');
+    const originalExt = file.name.split('.').pop();
+    let displayName = sanitizeDisplayName(file.name);
+    displayName = ensureExtension(displayName, originalExt);
+    const storedName = toStoredKey(displayName);
+    const fetchPrefix = folderObj.folder + '/';
+    
+    showToast(`⏳ Ανέβασμα: ${file.name}...`);
+    try {
+      const r = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodePathForUrl(fetchPrefix + storedName)}`, {
+        method:'POST', headers:{'Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON,'Content-Type':file.type||'application/octet-stream','x-upsert':'true'},
+        body:file
+      });
+      if(!r.ok) throw new Error(await r.text());
+      showToast(`✅ Το αρχείο ανέβηκε στον φάκελο: ${folderObj.name}`);
+    } catch(e) {
+      showToast('❌ Σφάλμα: ' + e.message);
+    }
   }
 
   /* ── Αναζήτηση και Εμφάνιση Αρχείων ── */
@@ -530,20 +556,29 @@
         const size = fObj.metadata && (fObj.metadata.size ?? fObj.metadata.contentLength);
         const updated = fObj.updated_at || fObj.created_at;
         const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodePathForUrl(fetchPrefix + item.stored)}`;
+        
+        /* ΝΕΟ: Υπολογισμός αν είναι "Νέο" αρχείο (Ανεβασμένο τις τελευταίες 7 ημέρες) */
+        const fileDateMs = new Date(updated).getTime();
+        const isNew = (Date.now() - fileDateMs) < (7 * 24 * 60 * 60 * 1000);
+        const badgeHtml = isNew ? `<span class="badge-new">ΝΕΟ</span>` : '';
+
         li.innerHTML = `
           <div class="doc-item">
             <a href="${url}" target="_blank" style="flex:1;display:flex;gap:1.2rem;text-decoration:none;color:inherit;width:100%;">
               <div class="doc-icon">${fileEmoji(item.display)}</div>
               <div class="doc-info">
-                <div class="doc-name">${item.display}</div>
+                <div class="doc-name">${item.display} ${badgeHtml}</div>
                 <div class="doc-meta">${formatBytes(size)}${size?' · ':''}${formatDate(updated)}</div>
               </div>
             </a>
-            ${isAdmin ? `
-              <div class="doc-actions">
+            
+            <div class="doc-actions" onclick="event.stopPropagation()">
+              <button title="Αντιγραφή Συνδέσμου" onclick="copyToClipboard('${escapeJsString(url)}')">🔗</button>
+              ${isAdmin ? `
                 <button title="Μετονομασία" onclick="renameFile('${escapeJsString(fetchPrefix)}', '${escapeJsString(item.stored)}', '${escapeJsString(item.display)}')">✏️</button>
                 <button title="Διαγραφή" onclick="deleteFile('${escapeJsString(fetchPrefix + item.stored)}')">🗑️</button>
-              </div>` : ''}
+              ` : ''}
+            </div>
           </div>
         `;
       }
@@ -692,10 +727,10 @@
     if(document.getElementById('pwd-input').value===ADMIN_PASS){
       isAdmin=true; document.getElementById('login-overlay').classList.remove('open');
       document.getElementById('admin-bar').classList.add('show'); document.getElementById('login-err').textContent='';
-      if(currentFolderIdx!==null) refreshDocs();
+      if(currentFolderIdx!==null) refreshDocs(); else showFolderView();
     }else{document.getElementById('login-err').textContent='Λάθος κωδικός';}
   }
-  function logout(){isAdmin=false;document.getElementById('admin-bar').classList.remove('show');showToast('Αποσυνδεθήκατε'); refreshDocs();}
+  function logout(){isAdmin=false;document.getElementById('admin-bar').classList.remove('show');showToast('Αποσυνδεθήκατε'); if(currentFolderIdx!==null) refreshDocs(); else showFolderView();}
 
   const headerEl = document.getElementById('mainHeader');
   headerEl.addEventListener('click', (e) => {
