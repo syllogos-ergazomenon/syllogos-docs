@@ -25,7 +25,8 @@
     #admin-bar { display: none; position: relative; z-index: 2; background: #16100a; color: #f0ead8; padding: 0.5rem 1.5rem; border-bottom: 2px solid var(--gold); align-items: center; gap: 1rem; font-size: 0.8rem; }
     #admin-bar.show { display: flex; }
     #admin-bar .ab-label { flex: 1; font-style: italic; font-family: 'Noto Serif', serif; color: #9a8868; }
-    #admin-bar button { background: none; border: 1px solid #6a5a40; border-radius: 3px; color: #f0ead8; padding: 0.28rem 0.75rem; cursor: pointer; font-family: inherit; font-size: 0.76rem; }
+    #admin-bar button { background: none; border: 1px solid #6a5a40; border-radius: 3px; color: #f0ead8; padding: 0.28rem 0.75rem; cursor: pointer; font-family: inherit; font-size: 0.76rem; transition: 0.2s; }
+    #admin-bar button:hover { background: #2c2015; border-color: var(--gold); }
     
     header { position: relative; z-index: 1; background: linear-gradient(-45deg, #1a1410, #2c1a14, #1f1b13, #301712); background-size: 400% 400%; animation: gradientBreath 15s ease infinite; color: #fdfcf9; text-align: center; padding: 3.5rem 1.5rem 3rem; border-bottom: 5px solid var(--gold); overflow: hidden; cursor: pointer; transition: filter 0.3s ease; }
     header:active { filter: brightness(1.3); }
@@ -56,10 +57,8 @@
     
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.8rem; }
     
-    /* ΝΕΟ: .folder-card.dragover για το Drag&Drop στους φακέλους */
-    .folder-card { background: var(--paper); border: 1px solid var(--border); border-top: 5px solid var(--rust); border-radius: 8px; padding: 2.8rem 1.5rem; cursor: pointer; text-align: center; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); animation: cardEnter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+    .folder-card { background: var(--paper); border: 1px solid var(--border); border-top: 5px solid var(--rust); border-radius: 8px; padding: 2.5rem 1.5rem; cursor: pointer; text-align: center; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); animation: cardEnter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; position: relative; display: flex; flex-direction: column; align-items: center; }
     .folder-card.dragover { border-color: var(--green); background: rgba(45, 106, 79, 0.05); transform: scale(1.03); box-shadow: 0 10px 30px rgba(45, 106, 79, 0.15); border-top-color: var(--green); }
-    
     .folder-card:nth-child(1) { animation-delay: 0.05s; } .folder-card:nth-child(2) { animation-delay: 0.10s; } .folder-card:nth-child(3) { animation-delay: 0.15s; } .folder-card:nth-child(4) { animation-delay: 0.20s; }
     @keyframes cardEnter { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
     
@@ -67,16 +66,27 @@
     .f-icon { font-size: 3.5rem; transition: transform 0.3s; }
     .folder-card:hover .f-icon { transform: scale(1.1); }
     .f-name { margin-top: 1.2rem; font-size: 1.25rem; }
+    
+    /* ΝΕΟ: Εμφάνιση πλήθους αρχείων */
+    .f-count { margin-top: 0.5rem; font-size: 0.8rem; color: var(--muted); font-weight: 500; }
     .f-action { margin-top: 1rem; font-size: 0.75rem; color: var(--rust); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; padding: 6px 14px; border: 1px solid transparent; border-radius: 20px; transition: 0.3s; }
     .folder-card:hover .f-action { background: var(--cream); border-color: var(--border); }
     
     #view-docs { display: none; }
     .doc-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2.2rem; flex-wrap: wrap; }
-    .back-btn { padding: 0.6rem 1.2rem; border: 1px solid var(--border); color: var(--ink); background: var(--paper); cursor: pointer; border-radius: 6px; font-family: inherit; font-weight: 500; font-size: 0.9rem; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+    
+    /* Έξυπνο Κουμπί Πίσω */
+    .back-btn { padding: 0.6rem 1.2rem; border: 1px solid var(--border); color: var(--ink); background: var(--paper); cursor: pointer; border-radius: 6px; font-family: inherit; font-weight: 500; font-size: 0.9rem; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 0.4rem; }
     .back-btn:hover { background: var(--cream); border-color: var(--gold); transform: translateY(-1px); }
+    
     .doc-title { font-size: 1.6rem; flex: 1; display: flex; align-items: center; flex-wrap: wrap; }
     
     .doc-toolbar { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-left: auto; }
+    
+    /* ΝΕΟ: Αναζήτηση μέσα στον φάκελο */
+    .sub-search { padding: 0.5rem 0.8rem 0.5rem 2rem; background: var(--paper) url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%237a7060" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>') no-repeat 0.6rem center; color: var(--ink); border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.85rem; outline: none; transition: 0.2s; width: 160px; }
+    .sub-search:focus { border-color: var(--gold); width: 200px; }
+    
     .sort-select { padding: 0.5rem 0.8rem; background: var(--paper); color: var(--ink); border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.85rem; cursor: pointer; outline: none; transition: 0.2s; }
     .sort-select:focus, .sort-select:hover { border-color: var(--gold); }
     .view-btn { background: var(--paper); border: 1px solid var(--border); color: var(--ink); padding: 0.5rem 0.6rem; cursor: pointer; border-radius: 6px; font-size: 1.1rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
@@ -92,6 +102,15 @@
     
     .doc-list { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
     
+    /* ΝΕΟ: Skeleton Loading Animation */
+    .skeleton-item { display: flex; align-items: center; gap: 1.2rem; padding: 1.2rem 1.4rem; border: 1px solid var(--border); border-radius: 6px; background: var(--paper); }
+    .skeleton-icon { width: 44px; height: 52px; border-radius: 4px; }
+    .skeleton-text-1 { width: 40%; height: 1.1rem; margin-bottom: 0.5rem; border-radius: 4px; }
+    .skeleton-text-2 { width: 20%; height: 0.8rem; border-radius: 4px; }
+    .shimmer { background: #e0d8c8; background-image: linear-gradient(90deg, #e0d8c8 0px, #f2ece0 40px, #e0d8c8 80px); background-size: 600px; animation: shimmer 1.5s infinite linear; }
+    body.dark-theme .shimmer { background: #3a3025; background-image: linear-gradient(90deg, #3a3025 0px, #4d4032 40px, #3a3025 80px); }
+    @keyframes shimmer { 0% { background-position: -200px 0; } 100% { background-position: 400px 0; } }
+
     .doc-list.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.2rem; }
     .doc-list.grid-view .doc-item { flex-direction: column; align-items: center; text-align: center; padding: 1.8rem 1rem; position: relative; gap: 0.8rem; }
     .doc-list.grid-view .doc-icon { width: 64px; height: 64px; font-size: 2.2rem; }
@@ -99,7 +118,7 @@
     .doc-list.grid-view .doc-actions { position: absolute; top: 10px; right: 10px; opacity: 0; background: var(--paper); border-radius: 4px; padding: 2px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-direction: column; }
     .doc-list.grid-view .doc-item:hover .doc-actions { opacity: 1; }
 
-    .doc-item { background: var(--paper); border: 1px solid var(--border); border-left: 4px solid var(--rust); border-radius: 6px; display: flex; align-items: flex-start; gap: 1.2rem; padding: 1.2rem 1.4rem; transition: all 0.25s ease; }
+    .doc-item { background: var(--paper); border: 1px solid var(--border); border-left: 4px solid var(--rust); border-radius: 6px; display: flex; align-items: flex-start; gap: 1.2rem; padding: 1.2rem 1.4rem; transition: all 0.25s ease; position: relative; }
     .doc-item:hover { border-left-color: var(--gold); box-shadow: 0 6px 20px rgba(0,0,0,0.08); background: var(--cream); transform: translateX(3px); }
     
     .doc-icon { width: 44px; min-width: 44px; height: 52px; display: flex; align-items: center; justify-content: center; background: var(--paper); border: 1px solid var(--border); border-radius: 4px; font-size: 1.4rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -108,20 +127,22 @@
     .doc-item:hover .doc-name { color: var(--rust); }
     .doc-meta { font-size: 0.8rem; color: var(--muted); margin-top: 0.4rem; }
     
-    /* ΝΕΟ: Badge για "ΝΕΟ!" αρχείο */
     .badge-new { background: var(--danger); color: white; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: bold; letter-spacing: 0.05em; display: inline-block; line-height: 1; box-shadow: 0 2px 5px rgba(179,38,30,0.3); }
     
-    /* Τροποποίηση για εμφάνιση ενεργειών (πλέον το 🔗 εμφανίζεται πάντα!) */
     .doc-actions { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; opacity: 0; transition: opacity 0.2s ease; }
     .doc-item:hover .doc-actions { opacity: 1; }
     .doc-actions button { background: var(--paper); border: 1px solid var(--border); color: var(--ink); cursor: pointer; font-size: 1rem; padding: 0.4rem; border-radius: 4px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     .doc-actions button:hover { background: var(--cream); border-color: var(--gold); transform: translateY(-2px); }
     
-    .empty, .loading { text-align: center; padding: 4rem; background: transparent; border: 2px dashed var(--border); border-radius: 8px; color: var(--muted); font-size: 1.1rem; animation: pulseFade 2s infinite ease-in-out; }
-    @keyframes pulseFade { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+    .empty { text-align: center; padding: 4rem; background: transparent; border: 2px dashed var(--border); border-radius: 8px; color: var(--muted); font-size: 1.1rem; }
     
-    #login-overlay, #modal-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
-    #login-overlay.open, #modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    /* ΝΕΟ: Image Preview Tooltip */
+    #image-tooltip { position: fixed; z-index: 9999; display: none; background: var(--paper); padding: 5px; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); pointer-events: none; }
+    #image-tooltip img { max-width: 250px; max-height: 250px; border-radius: 4px; display: block; object-fit: contain; }
+
+    #login-overlay, #modal-overlay, #confirm-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+    #login-overlay.open, #modal-overlay.open, #confirm-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     
     .modal-box { background: var(--paper); border-top: 5px solid var(--rust); border-radius: 8px; width: min(520px, 94vw); padding: 2.5rem; box-shadow: 0 25px 50px rgba(0,0,0,0.3); transform: translateY(0); animation: slideUp 0.3s ease; }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -131,16 +152,23 @@
     .modal-box input[type=text], .modal-box input[type=password], .modal-box select { width: 100%; padding: 0.7rem 1rem; margin-bottom: 1.2rem; background: var(--paper); color: var(--ink); border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.95rem; transition: 0.2s; }
     .modal-box input:focus, .modal-box select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.15); }
     
-    .drop-zone { border: 2px dashed var(--border); padding: 2.5rem 1rem; text-align: center; cursor: pointer; border-radius: 8px; transition: 0.2s; background: var(--cream); margin-bottom: 1.5rem; }
+    .drop-zone { border: 2px dashed var(--border); padding: 2.5rem 1rem; text-align: center; cursor: pointer; border-radius: 8px; transition: 0.2s; background: var(--cream); margin-bottom: 0.5rem; }
     .drop-zone:hover { border-color: var(--gold); }
     .drop-zone.dragover { border-color: var(--green); background: rgba(45,106,79,0.1); box-shadow: 0 0 0 4px rgba(45,106,79,0.1); }
     .drop-zone input { display: none; }
-    #drop-text { font-size: 1.1rem; font-weight: 500; color: var(--ink); }
-    .drop-hint { margin-top: 0.6rem; font-size: 0.85rem; color: var(--muted); }
+    #drop-text { font-size: 1.1rem; font-weight: 500; color: var(--ink); margin-bottom: 0.4rem; }
+    .drop-hint { font-size: 0.85rem; color: var(--muted); }
     
-    .modal-actions { display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1rem; }
+    /* ΝΕΟ: Μπάρα Προόδου Ανεβάσματος */
+    .progress-container { width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-top: 1rem; overflow: hidden; display: none; }
+    .progress-bar { height: 100%; width: 0%; background: var(--green); transition: width 0.1s; }
+    .progress-text { font-size: 0.75rem; color: var(--muted); text-align: right; margin-top: 0.3rem; display: none; }
+
+    .modal-actions { display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1.5rem; }
     .btn-cancel { border: 1px solid var(--border); background: var(--paper); color: var(--ink); padding: 0.6rem 1.2rem; cursor: pointer; border-radius: 25px; font-family: inherit; font-size: 0.9rem; font-weight: 500; transition: 0.2s; }
     .btn-cancel:hover { background: var(--cream); border-color: var(--muted); }
+    .btn-danger { background: var(--danger); color: white; border: none; border-radius: 25px; padding: 0.6rem 1.4rem; cursor: pointer; font-family: inherit; font-size: 0.9rem; font-weight: 600; transition: 0.2s; box-shadow: 0 4px 10px rgba(179,38,30,0.2); }
+    .btn-danger:hover { background: #8e1f18; }
     
     #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px); background: #1a1410; color: #fdfcf9; padding: 1rem 1.8rem; border-radius: 30px; font-weight: 500; font-size: 0.95rem; display: none; z-index: 999; box-shadow: 0 10px 30px rgba(0,0,0,0.3); opacity: 0; transition: all 0.3s ease; border-left: 4px solid var(--gold); }
     #toast.show { display: block; transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -153,7 +181,7 @@
     ::-moz-selection { background: var(--gold); color: #1a1410; text-shadow: none; }
 
     footer { background: var(--cream); padding: 3rem 1rem; text-align: center; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; margin-top: auto; }
-    @media (max-width:768px) { .header-logo-image { position: static; display: block; margin: 0 auto 1.5rem; height: 75px; } header { padding-top: 2rem; } .theme-toggle { top: 0.5rem; right: 0.5rem; padding: 0.4rem 0.8rem; font-size: 0.75rem; } .doc-actions { opacity: 1; } .doc-toolbar { width: 100%; justify-content: space-between; } }
+    @media (max-width:768px) { .header-logo-image { position: static; display: block; margin: 0 auto 1.5rem; height: 75px; } header { padding-top: 2rem; } .theme-toggle { top: 0.5rem; right: 0.5rem; padding: 0.4rem 0.8rem; font-size: 0.75rem; } .doc-actions { opacity: 1; } .doc-toolbar { width: 100%; justify-content: space-between; } .sub-search { width: 100%; margin-bottom: 0.5rem; } }
   </style>
 </head>
 
@@ -185,10 +213,11 @@
 
   <div id="view-docs">
     <div class="doc-header">
-      <button class="back-btn" onclick="goBack()">← Πίσω</button>
+      <button class="back-btn" id="backBtn" onclick="goBack()">← Κατηγορίες</button>
       <div class="doc-title" id="docTitle"></div>
       
       <div class="doc-toolbar">
+        <input type="text" class="sub-search" id="subSearchInput" placeholder="Φιλτράρισμα..." oninput="renderDocsView()">
         <select class="sort-select" id="sort-select" onchange="renderDocsView()">
           <option value="name_asc">Αλφαβητικά (Α-Ω)</option>
           <option value="name_desc">Αλφαβητικά (Ω-Α)</option>
@@ -214,6 +243,20 @@
   <p>&copy; <span id="yr"></span> Σύλλογος Εργαζομένων Π.Ε. Μαγνησίας</p>
 </footer>
 
+<div id="image-tooltip"><img id="tooltip-img" src="" alt="preview"></div>
+
+<div id="confirm-overlay">
+  <div class="modal-box" style="width: min(400px, 90vw); text-align: center; padding: 2rem;">
+    <h3 style="color: var(--danger); font-size: 2rem; margin-bottom: 0.5rem;">⚠️</h3>
+    <h3 id="confirm-title" style="margin-bottom: 1rem;">Επιβεβαίωση</h3>
+    <p id="confirm-msg" style="color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5;"></p>
+    <div class="modal-actions" style="justify-content: center; margin-top: 0;">
+      <button class="btn-cancel" onclick="closeConfirm(false)">Ακύρωση</button>
+      <button class="btn-danger" onclick="closeConfirm(true)">Ναι, διαγραφή</button>
+    </div>
+  </div>
+</div>
+
 <div id="login-overlay">
   <div class="modal-box">
     <h3>🔐 Σύνδεση Διαχειριστή</h3>
@@ -236,14 +279,18 @@
     <input type="text" id="upload-title" placeholder="Αφήστε κενό για το όνομα αρχείου">
     <label>Αρχείο</label>
     <div class="drop-zone" id="drop-zone">
-      <input type="file" id="file-input"
-        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,image/*,video/mp4,video/mpeg,video/quicktime,video/x-msvideo,video/webm"
-        onchange="handleFile(this)">
+      <input type="file" id="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,image/*,video/mp4,video/mpeg,video/quicktime,video/x-msvideo,video/webm" onchange="handleFile(this)">
       <div id="drop-text">📂 Επιλέξτε αρχείο</div>
       <div class="drop-hint">PDF, Word, Excel, Εικόνες, Βίντεο · Drag &amp; drop</div>
     </div>
+    
+    <div class="progress-container" id="upload-progress-container">
+      <div class="progress-bar" id="upload-progress-bar"></div>
+    </div>
+    <div class="progress-text" id="upload-progress-text">0%</div>
+
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeUpload()">Ακύρωση</button>
+      <button class="btn-cancel" id="upload-cancel-btn" onclick="closeUpload()">Ακύρωση</button>
       <button class="btn-primary" id="do-upload-btn" onclick="doUpload()" disabled>Ανέβασμα</button>
     </div>
   </div>
@@ -293,67 +340,21 @@
     const btnList = document.getElementById('listViewBtn');
     const btnGrid = document.getElementById('gridViewBtn');
     
-    if(mode === 'grid') {
-      list.classList.add('grid-view');
-      btnGrid.classList.add('active'); btnList.classList.remove('active');
-    } else {
-      list.classList.remove('grid-view');
-      btnList.classList.add('active'); btnGrid.classList.remove('active');
-    }
+    if(mode === 'grid') { list.classList.add('grid-view'); btnGrid.classList.add('active'); btnList.classList.remove('active'); } 
+    else { list.classList.remove('grid-view'); btnList.classList.add('active'); btnGrid.classList.remove('active'); }
   }
 
-  function b64urlEncodeUtf8(str) {
-    const bytes = new TextEncoder().encode(str);
-    let bin = '';
-    for (const b of bytes) bin += String.fromCharCode(b);
-    return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/g,'');
-  }
-  function b64urlDecodeUtf8(b64url) {
-    let b64 = b64url.replace(/-/g,'+').replace(/_/g,'/');
-    while (b64.length % 4) b64 += '=';
-    const bin = atob(b64);
-    const bytes = new Uint8Array([...bin].map(ch=>ch.charCodeAt(0)));
-    return new TextDecoder().decode(bytes);
-  }
-  function splitNameAndExt(n) {
-    const i = n.lastIndexOf('.');
-    if (i<=0||i===n.length-1) return {base:n,ext:''};
-    return {base:n.slice(0,i),ext:n.slice(i+1)};
-  }
-  function toStoredKey(displayName) {
-    const {base,ext} = splitNameAndExt(displayName);
-    const enc = base ? b64urlEncodeUtf8(base) : '';
-    return ext ? `u_${enc}.${ext}` : `u_${enc}`;
-  }
-  function fromStoredKey(storedName) {
-    if (!storedName || !storedName.startsWith('u_')) return storedName;
-    const rest = storedName.slice(2);
-    const i = rest.lastIndexOf('.');
-    const basePart = i>0 ? rest.slice(0,i) : rest;
-    const ext = i>0 ? rest.slice(i+1) : '';
-    try { const base = basePart ? b64urlDecodeUtf8(basePart) : ''; return ext?`${base}.${ext}`:base; }
-    catch { return storedName; }
-  }
+  function b64urlEncodeUtf8(str) { const bytes = new TextEncoder().encode(str); let bin = ''; for (const b of bytes) bin += String.fromCharCode(b); return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/g,''); }
+  function b64urlDecodeUtf8(b64url) { let b64 = b64url.replace(/-/g,'+').replace(/_/g,'/'); while (b64.length % 4) b64 += '='; const bin = atob(b64); const bytes = new Uint8Array([...bin].map(ch=>ch.charCodeAt(0))); return new TextDecoder().decode(bytes); }
+  function splitNameAndExt(n) { const i = n.lastIndexOf('.'); if (i<=0||i===n.length-1) return {base:n,ext:''}; return {base:n.slice(0,i),ext:n.slice(i+1)}; }
+  function toStoredKey(displayName) { const {base,ext} = splitNameAndExt(displayName); const enc = base ? b64urlEncodeUtf8(base) : ''; return ext ? `u_${enc}.${ext}` : `u_${enc}`; }
+  function fromStoredKey(storedName) { if (!storedName || !storedName.startsWith('u_')) return storedName; const rest = storedName.slice(2); const i = rest.lastIndexOf('.'); const basePart = i>0 ? rest.slice(0,i) : rest; const ext = i>0 ? rest.slice(i+1) : ''; try { const base = basePart ? b64urlDecodeUtf8(basePart) : ''; return ext?`${base}.${ext}`:base; } catch { return storedName; } }
   function encodePathForUrl(pathStr) { return pathStr.split('/').map(encodeURIComponent).join('/'); }
   function escapeJsString(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
-  function formatBytes(bytes) {
-    if (bytes==null||isNaN(bytes)) return '';
-    const units=['B','KB','MB','GB']; let b=Number(bytes),u=0;
-    while(b>=1024&&u<units.length-1){b/=1024;u++;}
-    return `${b.toFixed(b>=10||u===0?0:1)} ${units[u]}`;
-  }
-  function formatDate(iso) {
-    if (!iso) return '';
-    const d=new Date(iso);
-    if(isNaN(d.getTime())) return '';
-    return d.toLocaleString('el-GR',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  }
+  function formatBytes(bytes) { if (bytes==null||isNaN(bytes)) return ''; const units=['B','KB','MB','GB']; let b=Number(bytes),u=0; while(b>=1024&&u<units.length-1){b/=1024;u++;} return `${b.toFixed(b>=10||u===0?0:1)} ${units[u]}`; }
+  function formatDate(iso) { if (!iso) return ''; const d=new Date(iso); if(isNaN(d.getTime())) return ''; return d.toLocaleString('el-GR',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
   function sanitizeDisplayName(name) { return String(name).replace(/[^\p{L}\p{N}\s._-]/gu,'').trim(); }
-  function ensureExtension(displayName,fallbackExt) {
-    const {ext}=splitNameAndExt(displayName);
-    if(ext) return displayName;
-    return fallbackExt?`${displayName}.${fallbackExt}`:displayName;
-  }
+  function ensureExtension(displayName,fallbackExt) { const {ext}=splitNameAndExt(displayName); if(ext) return displayName; return fallbackExt?`${displayName}.${fallbackExt}`:displayName; }
 
   function fileEmoji(name) {
     const ext = name.split('.').pop().toLowerCase();
@@ -367,73 +368,72 @@
     return '📎';
   }
 
-  function showToast(msg) {
-    const t=document.getElementById('toast');
-    t.textContent=msg; t.classList.add('show');
-    setTimeout(() => { t.classList.remove('show'); }, 3500);
+  function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(() => { t.classList.remove('show'); }, 3500); }
+  function copyToClipboard(url) { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(url).then(() => showToast('🔗 Ο σύνδεσμος αντιγράφηκε!')).catch(() => showToast('❌ Αποτυχία.')); } else { const el = document.createElement('textarea'); el.value = url; document.body.appendChild(el); el.select(); try { document.execCommand('copy'); showToast('🔗 Ο σύνδεσμος αντιγράφηκε!'); } catch (err) { showToast('❌ Αποτυχία.'); } document.body.removeChild(el); } }
+
+  /* Custom Confirm */
+  let confirmResolve = null;
+  function customConfirm(msg) {
+    return new Promise(resolve => {
+      document.getElementById('confirm-msg').innerText = msg;
+      document.getElementById('confirm-overlay').classList.add('open');
+      confirmResolve = resolve;
+    });
+  }
+  function closeConfirm(res) {
+    document.getElementById('confirm-overlay').classList.remove('open');
+    if(confirmResolve) confirmResolve(res);
   }
 
-  /* ── ΝΕΟ: Αντιγραφή Συνδέσμου ── */
-  function copyToClipboard(url) {
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(url).then(() => showToast('🔗 Ο σύνδεσμος αντιγράφηκε!')).catch(() => showToast('❌ Αποτυχία αντιγραφής.'));
-    } else {
-      const el = document.createElement('textarea');
-      el.value = url; document.body.appendChild(el); el.select();
-      try { document.execCommand('copy'); showToast('🔗 Ο σύνδεσμος αντιγράφηκε!'); } 
-      catch (err) { showToast('❌ Αποτυχία αντιγραφής.'); }
-      document.body.removeChild(el);
-    }
+  /* Πλοήγηση */
+  function updateBackButton() {
+    const btn = document.getElementById('backBtn');
+    if (pathStack.length === 0) { btn.innerHTML = '← Κατηγορίες'; } 
+    else if (pathStack.length === 1) { btn.innerHTML = `← ${FOLDERS[currentFolderIdx].name}`; }
+    else { btn.innerHTML = `← ${pathStack[pathStack.length - 2].display}`; }
   }
+  function goBack() { if (pathStack.length === 0) { goToHome(); } else { pathStack.pop(); refreshDocs(); } }
+  function goToHome() { document.getElementById('view-folders').style.display='block'; document.getElementById('view-docs').style.display='none'; }
+  function showFolderView() { goToHome(); renderFolders(); fetchFolderCounts(); }
+  function showDocView(idx) { currentFolderIdx = idx; pathStack = []; document.getElementById('subSearchInput').value = ''; refreshDocs(); }
+  function enterSubFolder(storedName, displayName) { pathStack.push({ stored: storedName, display: displayName }); document.getElementById('subSearchInput').value = ''; refreshDocs(); }
 
-  /* ── Πλοήγηση ── */
-  function goBack() {
-    if (pathStack.length === 0) { goToHome(); } 
-    else { pathStack.pop(); refreshDocs(); }
-  }
-  function goToHome() {
-    document.getElementById('view-folders').style.display='block';
-    document.getElementById('view-docs').style.display='none';
-  }
-  function showFolderView() {
-    goToHome();
-    renderFolders();
-  }
-  function showDocView(idx) {
-    currentFolderIdx = idx;
-    pathStack = []; 
-    refreshDocs();
-  }
-  function enterSubFolder(storedName, displayName) {
-    pathStack.push({ stored: storedName, display: displayName });
-    refreshDocs();
-  }
-
+  /* Αρχική & File Counts */
   function renderFolders(filter='') {
-    const grid=document.getElementById('folderGrid');
-    grid.innerHTML='';
+    const grid = document.getElementById('folderGrid');
+    grid.innerHTML = '';
     FOLDERS.filter(f=>f.name.toLowerCase().includes(filter.toLowerCase())).forEach((f, i)=>{
-      const card=document.createElement('div');
-      card.className='folder-card';
-      card.innerHTML=`<div class="f-icon">${f.icon}</div><div class="f-name">${f.name}</div><div class="f-action">Άνοιγμα ↗</div>`;
-      card.onclick=()=>showDocView(FOLDERS.indexOf(f));
+      const card = document.createElement('div');
+      card.className = 'folder-card';
+      card.innerHTML = `<div class="f-icon">${f.icon}</div><div class="f-name">${f.name}</div><div class="f-count" id="count-${f.folder}">- αρχεία</div><div class="f-action">Άνοιγμα ↗</div>`;
+      card.onclick = () => showDocView(FOLDERS.indexOf(f));
       
-      /* ΝΕΟ: Drag & Drop απευθείας στην Κάρτα Φακέλου */
       card.ondragover = (e) => { e.preventDefault(); card.classList.add('dragover'); };
       card.ondragleave = (e) => { card.classList.remove('dragover'); };
-      card.ondrop = (e) => {
-        e.preventDefault();
-        card.classList.remove('dragover');
-        if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
-          quickUpload(e.dataTransfer.files[0], f);
-        }
-      };
+      card.ondrop = (e) => { e.preventDefault(); card.classList.remove('dragover'); if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) quickUpload(e.dataTransfer.files[0], f); };
       
       grid.appendChild(card);
     });
   }
 
-  /* ΝΕΟ: Γρήγορο Ανέβασμα από Drag&Drop */
+  async function fetchFolderCounts() {
+    for (let f of FOLDERS) {
+      const countEl = document.getElementById(`count-${f.folder}`);
+      if(!countEl) continue;
+      try {
+        const r = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
+          method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON},
+          body:JSON.stringify({prefix: f.folder+'/', limit:1000})
+        });
+        if(r.ok) {
+          const data = await r.json();
+          const count = data.filter(file => file.name !== '.keep' && file.name !== '.emptyFolderPlaceholder').length;
+          countEl.textContent = count === 1 ? '1 αρχείο' : `${count} αρχεία`;
+        }
+      } catch(e) {}
+    }
+  }
+
   async function quickUpload(file, folderObj) {
     if(!isAdmin) return showToast('🔒 Απαιτείται σύνδεση διαχειριστή για ανέβασμα αρχείων!');
     const originalExt = file.name.split('.').pop();
@@ -450,34 +450,46 @@
       });
       if(!r.ok) throw new Error(await r.text());
       showToast(`✅ Το αρχείο ανέβηκε στον φάκελο: ${folderObj.name}`);
-    } catch(e) {
-      showToast('❌ Σφάλμα: ' + e.message);
-    }
+      fetchFolderCounts();
+    } catch(e) { showToast('❌ Σφάλμα: ' + e.message); }
   }
 
-  /* ── Αναζήτηση και Εμφάνιση Αρχείων ── */
+  /* Έγγραφα & Skeleton */
+  function renderSkeleton() {
+    let html = '';
+    for(let i=0; i<4; i++) {
+      html += `
+        <li class="skeleton-item">
+          <div class="skeleton-icon shimmer"></div>
+          <div style="flex:1;">
+            <div class="skeleton-text-1 shimmer"></div>
+            <div class="skeleton-text-2 shimmer"></div>
+          </div>
+        </li>
+      `;
+    }
+    document.getElementById('docList').innerHTML = html;
+  }
+
   async function refreshDocs() {
     const f = FOLDERS[currentFolderIdx];
     document.getElementById('view-folders').style.display='none';
     document.getElementById('view-docs').style.display='block';
     
+    updateBackButton();
+    
     let breadcrumbsHtml = `<span style="color:var(--ink); cursor:pointer;" onclick="showDocView(${currentFolderIdx})">${f.icon} ${f.name}</span>`;
     pathStack.forEach((part, index) => {
       breadcrumbsHtml += `<span class="breadcrumb-separator">❯</span>`;
-      if (index === pathStack.length - 1) {
-        breadcrumbsHtml += `<span style="color:var(--rust); font-size:0.9em; font-family:'Inter',sans-serif; font-weight:600;">${part.display}</span>`;
-      } else {
-        const popCount = pathStack.length - 1 - index;
-        breadcrumbsHtml += `<span class="breadcrumb-muted" style="cursor:pointer;" onclick="for(let i=0;i<${popCount};i++)pathStack.pop(); refreshDocs();">${part.display}</span>`;
-      }
+      if (index === pathStack.length - 1) { breadcrumbsHtml += `<span style="color:var(--rust); font-size:0.9em; font-family:'Inter',sans-serif; font-weight:600;">${part.display}</span>`; } 
+      else { const popCount = pathStack.length - 1 - index; breadcrumbsHtml += `<span class="breadcrumb-muted" style="cursor:pointer;" onclick="for(let i=0;i<${popCount};i++)pathStack.pop(); refreshDocs();">${part.display}</span>`; }
     });
     document.getElementById('docTitle').innerHTML = breadcrumbsHtml;
     document.getElementById('upload-btn').style.display = isAdmin ? 'flex' : 'none';
     document.getElementById('new-folder-btn').style.display = isAdmin ? 'block' : 'none';
 
-    const list = document.getElementById('docList');
-    list.innerHTML = '<li class="loading">⏳ Φόρτωση εγγράφων...</li>';
     setViewMode(currentViewMode);
+    renderSkeleton();
 
     const subPrefix = pathStack.map(p => p.stored).join('/');
     const fetchPrefix = f.folder + '/' + (subPrefix ? subPrefix + '/' : '');
@@ -493,11 +505,8 @@
       
       cachedFiles = data.map(file => {
         if (file.name === '.keep' || file.name === '.emptyFolderPlaceholder') return null;
-        if (!file.id || !file.metadata) {
-          return { type: 'folder', stored: file.name, display: fromStoredKey(file.name) };
-        } else {
-          return { type: 'file', stored: file.name, display: fromStoredKey(file.name), fileObj: file };
-        }
+        if (!file.id || !file.metadata) { return { type: 'folder', stored: file.name, display: fromStoredKey(file.name) }; } 
+        else { return { type: 'file', stored: file.name, display: fromStoredKey(file.name), fileObj: file }; }
       }).filter(Boolean);
 
       renderDocsView();
@@ -513,22 +522,20 @@
     const subPrefix = pathStack.map(p => p.stored).join('/');
     const fetchPrefix = f.folder + '/' + (subPrefix ? subPrefix + '/' : '');
 
-    if (cachedFiles.length === 0) { list.innerHTML = '<li class="empty">📂 Ο φάκελος είναι άδειος.</li>'; return; }
+    // Αναζήτηση & Φιλτράρισμα
+    const searchTerm = document.getElementById('subSearchInput').value.toLowerCase();
+    const filteredFiles = cachedFiles.filter(item => item.display.toLowerCase().includes(searchTerm));
+
+    if (filteredFiles.length === 0) { list.innerHTML = '<li class="empty">📂 Δεν βρέθηκαν αρχεία.</li>'; return; }
 
     const sortVal = document.getElementById('sort-select').value;
-    const sorted = [...cachedFiles].sort((a,b) => {
+    const sorted = [...filteredFiles].sort((a,b) => {
       if(a.type !== b.type) return a.type === 'folder' ? -1 : 1; 
       
       let valA, valB;
-      if (sortVal.startsWith('name')) {
-        valA = a.display.toLowerCase(); valB = b.display.toLowerCase();
-      } else if (sortVal.startsWith('date')) {
-        valA = a.type === 'folder' ? 0 : new Date(a.fileObj.updated_at || a.fileObj.created_at).getTime();
-        valB = b.type === 'folder' ? 0 : new Date(b.fileObj.updated_at || b.fileObj.created_at).getTime();
-      } else if (sortVal.startsWith('size')) {
-        valA = a.type === 'folder' ? 0 : (a.fileObj.metadata?.size || 0);
-        valB = b.type === 'folder' ? 0 : (b.fileObj.metadata?.size || 0);
-      }
+      if (sortVal.startsWith('name')) { valA = a.display.toLowerCase(); valB = b.display.toLowerCase(); } 
+      else if (sortVal.startsWith('date')) { valA = a.type === 'folder' ? 0 : new Date(a.fileObj.updated_at || a.fileObj.created_at).getTime(); valB = b.type === 'folder' ? 0 : new Date(b.fileObj.updated_at || b.fileObj.created_at).getTime(); } 
+      else if (sortVal.startsWith('size')) { valA = a.type === 'folder' ? 0 : (a.fileObj.metadata?.size || 0); valB = b.type === 'folder' ? 0 : (b.fileObj.metadata?.size || 0); }
 
       if (valA < valB) return sortVal.endsWith('asc') ? -1 : 1;
       if (valA > valB) return sortVal.endsWith('asc') ? 1 : -1;
@@ -557,13 +564,12 @@
         const updated = fObj.updated_at || fObj.created_at;
         const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodePathForUrl(fetchPrefix + item.stored)}`;
         
-        /* ΝΕΟ: Υπολογισμός αν είναι "Νέο" αρχείο (Ανεβασμένο τις τελευταίες 7 ημέρες) */
-        const fileDateMs = new Date(updated).getTime();
-        const isNew = (Date.now() - fileDateMs) < (7 * 24 * 60 * 60 * 1000);
+        const isNew = (Date.now() - new Date(updated).getTime()) < (7 * 24 * 60 * 60 * 1000);
         const badgeHtml = isNew ? `<span class="badge-new">ΝΕΟ</span>` : '';
+        const isImage = ['jpg','jpeg','png','gif','webp'].includes(item.display.split('.').pop().toLowerCase());
 
         li.innerHTML = `
-          <div class="doc-item">
+          <div class="doc-item" ${isImage ? `onmouseenter="showPreview('${url}', event)" onmouseleave="hidePreview()" onmousemove="movePreview(event)"` : ''}>
             <a href="${url}" target="_blank" style="flex:1;display:flex;gap:1.2rem;text-decoration:none;color:inherit;width:100%;">
               <div class="doc-icon">${fileEmoji(item.display)}</div>
               <div class="doc-info">
@@ -586,63 +592,55 @@
     });
   }
 
-  /* ── Λειτουργίες Αρχείων & Φακέλων ── */
+  /* Image Preview Logic */
+  const tooltip = document.getElementById('image-tooltip');
+  const tooltipImg = document.getElementById('tooltip-img');
+  function showPreview(url, e) { tooltipImg.src = url; tooltip.style.display = 'block'; movePreview(e); }
+  function hidePreview() { tooltip.style.display = 'none'; tooltipImg.src = ''; }
+  function movePreview(e) { 
+    let top = e.clientY + 15; let left = e.clientX + 15;
+    if(top + 260 > window.innerHeight) top = e.clientY - 260;
+    if(left + 260 > window.innerWidth) left = e.clientX - 260;
+    tooltip.style.top = top + 'px'; tooltip.style.left = left + 'px'; 
+  }
+
+  /* Φάκελοι & Αρχεία Λειτουργίες */
   async function createFolder() {
     const raw = prompt('Όνομα νέου φακέλου:');
     if(!raw) return;
     const name = sanitizeDisplayName(raw);
     if(!name) return;
-    
     const f = FOLDERS[currentFolderIdx];
     const subPrefix = pathStack.map(p => p.stored).join('/');
     const fetchPrefix = f.folder + '/' + (subPrefix ? subPrefix + '/' : '');
     const keepPath = fetchPrefix + toStoredKey(name) + '/.keep';
-
     const emptyBlob = new Blob([''], { type: 'text/plain' });
-    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodePathForUrl(keepPath)}`, {
-       method: 'POST',
-       headers: { 'Authorization': `Bearer ${SUPABASE_ANON}`, 'apikey': SUPABASE_ANON, 'x-upsert': 'true' },
-       body: emptyBlob
-    });
+    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodePathForUrl(keepPath)}`, { method: 'POST', headers: { 'Authorization': `Bearer ${SUPABASE_ANON}`, 'apikey': SUPABASE_ANON, 'x-upsert': 'true' }, body: emptyBlob });
     showToast('Ο φάκελος δημιουργήθηκε!'); refreshDocs();
   }
 
   async function _recursiveDelete(prefix) {
-    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
-      method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON},
-      body:JSON.stringify({prefix: prefix, limit:1000})
-    });
+    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON}, body:JSON.stringify({prefix: prefix, limit:1000}) });
     const data = await r.json();
     for (let f of data) {
       if (!f.id) { await _recursiveDelete(prefix + f.name + '/'); } 
-      else {
-        await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodePathForUrl(prefix + f.name)}`, {
-          method:'DELETE', headers:{'Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON}
-        });
-      }
+      else { await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodePathForUrl(prefix + f.name)}`, { method:'DELETE', headers:{'Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON} }); }
     }
   }
   async function deleteDirectory(prefix, displayName) {
-    if(!confirm(`ΠΡΟΣΟΧΗ:\nΝα διαγραφεί ο φάκελος "${displayName}" και ΟΛΑ τα αρχεία που περιέχει;`)) return;
+    const confirmed = await customConfirm(`Θέλετε σίγουρα να διαγράψετε τον φάκελο "${displayName}" και ΟΛΑ τα αρχεία που περιέχει; Αυτή η ενέργεια δεν αναιρείται.`);
+    if(!confirmed) return;
     showToast('⏳ Διαγραφή σε εξέλιξη...');
     await _recursiveDelete(prefix);
     showToast('Ο φάκελος διεγράφη οριστικά.'); refreshDocs();
   }
 
   async function _recursiveRename(oldPrefix, newPrefix) {
-    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
-      method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON},
-      body:JSON.stringify({prefix: oldPrefix, limit:1000})
-    });
+    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON}, body:JSON.stringify({prefix: oldPrefix, limit:1000}) });
     const data = await r.json();
     for (let f of data) {
       if (!f.id) { await _recursiveRename(oldPrefix + f.name + '/', newPrefix + f.name + '/'); } 
-      else {
-        await fetch(`${SUPABASE_URL}/storage/v1/object/move`, {
-          method:'POST', headers:{'Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON,'Content-Type':'application/json'},
-          body:JSON.stringify({bucketId:BUCKET, sourceKey: oldPrefix + f.name, destinationKey: newPrefix + f.name})
-        });
-      }
+      else { await fetch(`${SUPABASE_URL}/storage/v1/object/move`, { method:'POST', headers:{'Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON,'Content-Type':'application/json'}, body:JSON.stringify({bucketId:BUCKET, sourceKey: oldPrefix + f.name, destinationKey: newPrefix + f.name}) }); }
     }
   }
   async function renameDirectory(basePrefix, oldStored, oldDisplay) {
@@ -655,24 +653,26 @@
     showToast('Ο φάκελος μετονομάστηκε!'); refreshDocs();
   }
 
+  /* Upload Logic με Progress Bar (XHR) */
   function openUpload() {
     const sel = document.getElementById('upload-folder-select'); sel.innerHTML = '';
     const f = FOLDERS[currentFolderIdx];
     let pathDisplay = f.name;
     if (pathStack.length > 0) pathDisplay += ' / ' + pathStack[pathStack.length - 1].display;
-    const o = document.createElement('option');
-    o.value = currentFolderIdx; o.textContent = pathDisplay; o.selected = true; sel.appendChild(o);
+    const o = document.createElement('option'); o.value = currentFolderIdx; o.textContent = pathDisplay; o.selected = true; sel.appendChild(o);
     
-    selectedFile=null; document.getElementById('upload-title').value='';
-    document.getElementById('drop-text').textContent='📂 Επιλέξτε αρχείο';
+    selectedFile=null; document.getElementById('upload-title').value=''; document.getElementById('drop-text').textContent='📂 Επιλέξτε αρχείο';
     document.getElementById('do-upload-btn').disabled=true;
+    document.getElementById('upload-progress-container').style.display='none';
+    document.getElementById('upload-progress-text').style.display='none';
+    document.getElementById('upload-progress-bar').style.width = '0%';
     document.getElementById('modal-overlay').classList.add('open');
   }
-  function closeUpload(){document.getElementById('modal-overlay').classList.remove('open');}
-  function setSelectedFile(file){selectedFile=file;document.getElementById('drop-text').textContent='✅ '+file.name;document.getElementById('do-upload-btn').disabled=false;}
-  function handleFile(input){if(input.files&&input.files[0])setSelectedFile(input.files[0]);}
+  function closeUpload(){ document.getElementById('modal-overlay').classList.remove('open'); }
+  function setSelectedFile(file){ selectedFile=file; document.getElementById('drop-text').textContent='✅ '+file.name; document.getElementById('do-upload-btn').disabled=false; }
+  function handleFile(input){ if(input.files&&input.files[0]) setSelectedFile(input.files[0]); }
 
-  async function doUpload() {
+  function doUpload() {
     if(!selectedFile) return;
     const f = FOLDERS[currentFolderIdx];
     const subPrefix = pathStack.map(p => p.stored).join('/');
@@ -685,23 +685,49 @@
     const storedName = toStoredKey(displayName);
     
     const btn = document.getElementById('do-upload-btn');
-    btn.disabled=true; btn.textContent='⏳ Ανέβασμα...';
-    try {
-      const r = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodePathForUrl(fetchPrefix + storedName)}`, {
-        method:'POST', headers:{'Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON,'Content-Type':selectedFile.type||'application/octet-stream','x-upsert':'true'},
-        body:selectedFile
-      });
-      if(!r.ok) throw new Error(await r.text());
-      closeUpload(); showToast('✅ Το αρχείο ανέβηκε!'); refreshDocs();
-    } catch(e) { showToast('Σφάλμα: '+(e.message)); }
-    finally { btn.disabled=false; btn.textContent='Ανέβασμα'; }
+    const cancelBtn = document.getElementById('upload-cancel-btn');
+    const progContainer = document.getElementById('upload-progress-container');
+    const progBar = document.getElementById('upload-progress-bar');
+    const progText = document.getElementById('upload-progress-text');
+    
+    btn.disabled=true; cancelBtn.disabled=true; btn.textContent='Ανέβασμα...';
+    progContainer.style.display='block'; progText.style.display='block';
+
+    const url = `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodePathForUrl(fetchPrefix + storedName)}`;
+    const xhr = new XMLHttpRequest();
+    
+    xhr.upload.onprogress = (e) => {
+      if(e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        progBar.style.width = percent + '%';
+        progText.textContent = percent + '% ολοκληρώθηκε';
+      }
+    };
+    
+    xhr.onload = () => {
+      btn.disabled=false; cancelBtn.disabled=false; btn.textContent='Ανέβασμα';
+      if(xhr.status >= 200 && xhr.status < 300) {
+        closeUpload(); showToast('✅ Το αρχείο ανέβηκε!'); refreshDocs();
+      } else { showToast('Σφάλμα: ' + xhr.statusText); }
+    };
+    
+    xhr.onerror = () => {
+      btn.disabled=false; cancelBtn.disabled=false; btn.textContent='Ανέβασμα';
+      showToast('❌ Σφάλμα δικτύου κατά το ανέβασμα.');
+    };
+
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_ANON}`);
+    xhr.setRequestHeader('apikey', SUPABASE_ANON);
+    xhr.setRequestHeader('Content-Type', selectedFile.type || 'application/octet-stream');
+    xhr.setRequestHeader('x-upsert', 'true');
+    xhr.send(selectedFile);
   }
 
   async function deleteFile(fullStoredPath) {
-    if(!confirm('Να διαγραφεί το αρχείο;')) return;
-    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodePathForUrl(fullStoredPath)}`, {
-      method:'DELETE', headers:{'Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON}
-    });
+    const confirmed = await customConfirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτό το αρχείο;');
+    if(!confirmed) return;
+    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodePathForUrl(fullStoredPath)}`, { method:'DELETE', headers:{'Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON} });
     showToast('Διαγράφηκε'); refreshDocs();
   }
 
@@ -715,10 +741,7 @@
     if(newDisplay === oldDisplay) return;
     
     const newStoredName = toStoredKey(newDisplay);
-    await fetch(`${SUPABASE_URL}/storage/v1/object/move`, {
-      method:'POST', headers:{'Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON,'Content-Type':'application/json'},
-      body:JSON.stringify({bucketId:BUCKET, sourceKey: basePrefix + oldStored, destinationKey: basePrefix + newStoredName})
-    });
+    await fetch(`${SUPABASE_URL}/storage/v1/object/move`, { method:'POST', headers:{'Authorization':`Bearer ${SUPABASE_ANON}`,'apikey':SUPABASE_ANON,'Content-Type':'application/json'}, body:JSON.stringify({bucketId:BUCKET, sourceKey: basePrefix + oldStored, destinationKey: basePrefix + newStoredName}) });
     showToast('Μετονομάστηκε'); refreshDocs();
   }
 
@@ -740,7 +763,6 @@
     headerEl.style.backgroundSize = '400% 400%';
   });
 
-  /* ── Init ── */
   document.getElementById('logoBtn').addEventListener('click',()=>{
     let c=parseInt(sessionStorage.getItem('clicks')||'0',10);
     c++; sessionStorage.setItem('clicks',c);
